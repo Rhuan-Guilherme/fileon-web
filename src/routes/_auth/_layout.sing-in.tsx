@@ -5,6 +5,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
+import { ErrorForm } from '@/components/ui/error-form';
 
 export const Route = createFileRoute('/_auth/_layout/sing-in')({
   component: RouteComponent,
@@ -43,22 +44,29 @@ function RouteComponent() {
     >
       <div className="flex flex-col gap-2">
         <Label htmlFor="email">Email</Label>
-        <Input type="email" id="email" {...register('email')} />
+        <Input
+          type="email"
+          id="email"
+          {...register('email')}
+          className={`${errors && errors.email?.message ? ' focus-visible:ring-rose-400' : ''}`}
+        />
+        {errors && errors.email?.message && (
+          <ErrorForm message={errors.email.message} />
+        )}
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="password">Senha</Label>
-        <Input type="password" id="password" {...register('password')} />
+        <Input
+          type="password"
+          id="password"
+          {...register('password')}
+          className={`${errors && errors.password?.message ? ' focus-visible:ring-rose-400' : ''}`}
+        />
+        {errors && errors.password?.message && (
+          <ErrorForm message={errors.password.message} />
+        )}
       </div>
-      {errors && errors.email?.message && (
-        <p className="text-sm text-rose-400 font-semibold">
-          {errors.email.message}
-        </p>
-      )}
-      {errors && errors.password?.message && (
-        <p className="text-sm text-rose-400 font-semibold">
-          {errors.password.message}
-        </p>
-      )}
+
       <div>
         <Button type="submit">Entrar</Button>
       </div>
