@@ -38,50 +38,69 @@ function RouteComponent() {
     console.log(errors);
   };
   return (
-    <form
-      onSubmit={handleSubmit(handleSingIn, handleErrors)}
-      className="w-11/12 max-w-sm mx-auto flex flex-col gap-4 mt-10"
-    >
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Nome</Label>
-        <Input
-          type="text"
-          id="name"
-          {...register('name')}
-          className={`${errors && errors.name?.message ? ' focus-visible:ring-rose-400' : ''}`}
-        />
-        {errors && errors.name?.message && (
-          <ErrorForm message={errors.name.message} />
-        )}
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          type="email"
-          id="email"
-          {...register('email')}
-          className={`${errors && errors.email?.message ? ' focus-visible:ring-rose-400' : ''}`}
-        />
-        {errors && errors.email?.message && (
-          <ErrorForm message={errors.email.message} />
-        )}
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="password">Senha</Label>
-        <Input
-          type="password"
-          id="password"
-          {...register('password')}
-          className={`${errors && errors.password?.message ? ' focus-visible:ring-rose-400' : ''}`}
-        />
-        {errors && errors.password?.message && (
-          <ErrorForm message={errors.password.message} />
-        )}
-      </div>
-      <div>
-        <Button type="submit">Registrar</Button>
-      </div>
-      <Link to="/sing-in">Login</Link>
-    </form>
+    <div className="w-11/12 max-w-sm mx-auto shadow p-6 rounded-lg border-foreground/10 border">
+      <h1 className="text-foreground/90 text-2xl font-bold">Crie sua conta</h1>
+
+      <form
+        onSubmit={handleSubmit(handleSingIn, handleErrors)}
+        className="flex flex-col gap-4 mt-10"
+      >
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="name" className="text-muted-foreground">
+            Nome
+          </Label>
+          <Input
+            type="text"
+            id="name"
+            {...register('name')}
+            className={`${errors && errors.name?.message ? ' focus-visible:ring-rose-400' : ''}`}
+          />
+          {errors && errors.name?.message && (
+            <ErrorForm message={errors.name.message} />
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="email" className="text-muted-foreground">
+            Email
+          </Label>
+          <Input
+            type="email"
+            id="email"
+            {...register('email')}
+            className={`${errors && errors.email?.message ? ' focus-visible:ring-rose-400' : ''}`}
+          />
+          {errors && errors.email?.message && (
+            <ErrorForm message={errors.email.message} />
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="password" className="text-muted-foreground">
+            Senha
+          </Label>
+          <Input
+            type="password"
+            id="password"
+            {...register('password')}
+            className={`${errors && errors.password?.message ? ' focus-visible:ring-rose-400' : ''}`}
+          />
+          {errors && errors.password?.message && (
+            <ErrorForm message={errors.password.message} />
+          )}
+        </div>
+        <div>
+          <Button type="submit">Registrar</Button>
+        </div>
+      </form>
+
+      <p className="mt-4 text-muted-foreground font-semibold">
+        Já possui uma conta?
+        <Link
+          to="/sing-in"
+          className="ml-1 text-blue-400 font-semibold hover:underline"
+        >
+          Entre aqui.
+        </Link>
+      </p>
+    </div>
   );
 }
