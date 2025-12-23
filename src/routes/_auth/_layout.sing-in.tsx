@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
@@ -21,6 +21,8 @@ const singInSchema = z.object({
 type SingInForm = z.infer<typeof singInSchema>;
 
 function RouteComponent() {
+  const navigate = useNavigate();
+
   const {
     handleSubmit,
     register,
@@ -42,6 +44,7 @@ function RouteComponent() {
       });
       console.log(response.data);
       reset();
+      navigate({ to: '..' });
     } catch (error) {
       console.log(error);
     }
