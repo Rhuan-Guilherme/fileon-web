@@ -1,9 +1,12 @@
+import { registerUser } from '@/api/register-user';
 import { Button } from '@/components/ui/button';
 import { ErrorForm } from '@/components/ui/error-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import z from 'zod';
 
@@ -12,14 +15,15 @@ export const Route = createFileRoute('/_auth/_layout/sing-up')({
 });
 
 const singInSchema = z.object({
-  name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
-  email: z.email('Email inválido'),
+  name: z.string().min(2, 'Infome o seu nome'),
+  email: z.email('Insira um email válido'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 });
 
 type SingInForm = z.infer<typeof singInSchema>;
 
 function RouteComponent() {
+  const [userAlreadyExists, setUserAlreadyExists] = useState(false);
   const {
     handleSubmit,
     register,
@@ -29,9 +33,22 @@ function RouteComponent() {
     resolver: zodResolver(singInSchema),
   });
 
-  const handleSingIn = (data: SingInForm) => {
-    console.log(data);
-    reset();
+  const { mutateAsync: registerUserMutation } = useMutation({
+    mutationFn: registerUser,
+  });
+
+  const handleSingIn = async (data: SingInForm) => {
+    try {
+      await registerUserMutation({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+      reset();
+    } catch (error) {
+      setUserAlreadyExists(true);
+      console.log(error);
+    }
   };
 
   const handleErrors = (errors: FieldErrors<SingInForm>) => {
@@ -90,6 +107,9 @@ function RouteComponent() {
         <div>
           <Button type="submit">Registrar</Button>
         </div>
+        {userAlreadyExists && (
+          <ErrorForm message="Usuário já existe. Tente novamente com outro email." />
+        )}
       </form>
 
       <p className="mt-4 text-muted-foreground font-semibold">

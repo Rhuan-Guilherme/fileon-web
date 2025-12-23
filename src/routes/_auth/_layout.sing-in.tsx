@@ -6,6 +6,8 @@ import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { ErrorForm } from '@/components/ui/error-form';
+import { useMutation } from '@tanstack/react-query';
+import { authenticateUser } from '@/api/authenticate-uset';
 
 export const Route = createFileRoute('/_auth/_layout/sing-in')({
   component: RouteComponent,
@@ -13,7 +15,7 @@ export const Route = createFileRoute('/_auth/_layout/sing-in')({
 
 const singInSchema = z.object({
   email: z.email('Email inválido'),
-  password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
+  password: z.string().min(1, 'Digite sua senha'),
 });
 
 type SingInForm = z.infer<typeof singInSchema>;
@@ -28,9 +30,21 @@ function RouteComponent() {
     resolver: zodResolver(singInSchema),
   });
 
-  const handleSingIn = (data: SingInForm) => {
-    console.log(data);
-    reset();
+  const { mutateAsync: authenticateUserMutation, isPending } = useMutation({
+    mutationFn: authenticateUser,
+  });
+
+  const handleSingIn = async (data: SingInForm) => {
+    try {
+      const response = await authenticateUserMutation({
+        email: data.email,
+        password: data.password,
+      });
+      console.log(response.data);
+      reset();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleErrors = (errors: FieldErrors<SingInForm>) => {
@@ -77,7 +91,9 @@ function RouteComponent() {
         </div>
 
         <div>
-          <Button type="submit">Entrar</Button>
+          <Button type="submit" disabled={isPending}>
+            {isPending ? 'Entrando...' : 'Entrar'}
+          </Button>
         </div>
 
         <p className="mt-4 text-muted-foreground font-semibold">
