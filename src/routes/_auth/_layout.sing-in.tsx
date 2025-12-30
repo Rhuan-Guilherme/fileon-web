@@ -8,6 +8,8 @@ import z from 'zod';
 import { ErrorForm } from '@/components/ui/error-form';
 import { useMutation } from '@tanstack/react-query';
 import { authenticateUser } from '@/api/authenticate-uset';
+import { Eye, EyeOff, FileText, Lock, Mail } from 'lucide-react';
+import { useState } from 'react';
 
 export const Route = createFileRoute('/_auth/_layout/sing-in')({
   component: RouteComponent,
@@ -21,6 +23,7 @@ const singInSchema = z.object({
 type SingInForm = z.infer<typeof singInSchema>;
 
 function RouteComponent() {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const {
@@ -55,10 +58,20 @@ function RouteComponent() {
   };
 
   return (
-    <div className="w-11/12 max-w-sm mx-auto shadow p-6 rounded-lg border-foreground/10 border">
+    <div className="w-11/12 max-w-md mx-auto shadow p-6 rounded-lg ">
+      <div className="flex items-center mb-6">
+        <div className="bg-blue-600 p-2 rounded-xl mr-2">
+          <FileText className="text-white" size={20} />
+        </div>
+        <h1 className="text-foreground font-semibold text-2xl">FileOn</h1>
+      </div>
+
       <h1 className="text-foreground/90 text-2xl font-bold">
-        Bem vindo de volta!
+        Acesse sua conta
       </h1>
+      <p className="text-muted-foreground text-sm">
+        Organize e solicite documentos de forma simples e segura.
+      </p>
 
       <form
         onSubmit={handleSubmit(handleSingIn, handleErrors)}
@@ -68,12 +81,20 @@ function RouteComponent() {
           <Label htmlFor="email" className="text-muted-foreground">
             Email
           </Label>
-          <Input
-            type="email"
-            id="email"
-            {...register('email')}
-            className={`${errors && errors.email?.message ? ' focus-visible:ring-rose-400' : ''}`}
-          />
+          <div className="relative">
+            <Mail
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+              size={16}
+            />
+            <Input
+              type="email"
+              id="email"
+              placeholder="exemplo@exemplo.com"
+              {...register('email')}
+              className={`pl-9 placeholder:text-muted-foreground/70 ${errors && errors.email?.message ? ' focus-visible:ring-rose-400' : ''}`}
+            />
+          </div>
+
           {errors && errors.email?.message && (
             <ErrorForm message={errors.email.message} />
           )}
@@ -82,30 +103,60 @@ function RouteComponent() {
           <Label htmlFor="password" className="text-muted-foreground">
             Senha
           </Label>
-          <Input
-            type="password"
-            id="password"
-            {...register('password')}
-            className={`${errors && errors.password?.message ? ' focus-visible:ring-rose-400' : ''}`}
-          />
+          <div className="relative">
+            <Lock
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+              size={16}
+            />
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              {...register('password')}
+              placeholder="••••••••"
+              className={`pl-9  placeholder:text-muted-foreground/70 ${errors && errors.password?.message ? ' focus-visible:ring-rose-400' : ''}`}
+            />
+            {showPassword ? (
+              <Eye
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+                size={16}
+              />
+            ) : (
+              <EyeOff
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+                size={16}
+              />
+            )}
+          </div>
+
           {errors && errors.password?.message && (
             <ErrorForm message={errors.password.message} />
           )}
         </div>
 
         <div>
-          <Button type="submit" disabled={isPending}>
-            {isPending ? 'Entrando...' : 'Entrar'}
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? 'Entrando...' : 'Entrar na plataforma'}
           </Button>
         </div>
 
-        <p className="mt-4 text-muted-foreground font-semibold">
-          Ainda não possui conta?
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-zinc-200"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-3 bg-white text-zinc-400">ou</span>
+          </div>
+        </div>
+
+        <p className="text-muted-foreground text-sm flex justify-center">
+          Ainda não tem acesso?
           <Link
             to="/sing-up"
-            className="ml-1 text-blue-400 font-semibold hover:underline"
+            className="ml-1 text-blue-500 font-semibold hover:underline"
           >
-            Crie agora.
+            Criar uma conta gratuita
           </Link>
         </p>
       </form>
