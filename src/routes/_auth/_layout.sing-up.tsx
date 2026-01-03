@@ -3,12 +3,13 @@ import { Button } from '@/components/ui/button';
 import { ErrorForm } from '@/components/ui/error-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useUserStore } from '@/store/user-store';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, Navigate } from '@tanstack/react-router';
 import { Eye, EyeOff, FileText } from 'lucide-react';
 import { useState } from 'react';
-import { useForm, type FieldErrors } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import z from 'zod';
 
 export const Route = createFileRoute('/_auth/_layout/sing-up')({
@@ -24,6 +25,7 @@ const singInSchema = z.object({
 type SingInForm = z.infer<typeof singInSchema>;
 
 function RouteComponent() {
+  const { user } = useUserStore();
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const [userAlreadyExists, setUserAlreadyExists] = useState(false);
@@ -54,9 +56,10 @@ function RouteComponent() {
     }
   };
 
-  const handleErrors = (errors: FieldErrors<SingInForm>) => {
-    console.log(errors);
-  };
+  if (user) {
+    return <Navigate to=".." />;
+  }
+
   return (
     <div className="w-11/12 max-w-md mx-auto shadow p-6 rounded-lg">
       <div className="flex items-center mb-6">
@@ -72,7 +75,7 @@ function RouteComponent() {
       </p>
 
       <form
-        onSubmit={handleSubmit(handleSingIn, handleErrors)}
+        onSubmit={handleSubmit(handleSingIn)}
         className="flex flex-col gap-4 mt-10"
       >
         <div className="flex flex-col gap-2">
