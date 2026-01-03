@@ -9,13 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HomeLayoutRouteImport } from './routes/_home/_layout'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/_layout'
+import { Route as HomeLayoutHomeRouteImport } from './routes/_home/_layout.home'
 import { Route as AuthLayoutSingUpRouteImport } from './routes/_auth/_layout.sing-up'
 import { Route as AuthLayoutSingInRouteImport } from './routes/_auth/_layout.sing-in'
 
+const HomeLayoutRoute = HomeLayoutRouteImport.update({
+  id: '/_home/_layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_auth/_layout',
   getParentRoute: () => rootRouteImport,
+} as any)
+const HomeLayoutHomeRoute = HomeLayoutHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => HomeLayoutRoute,
 } as any)
 const AuthLayoutSingUpRoute = AuthLayoutSingUpRouteImport.update({
   id: '/sing-up',
@@ -31,41 +42,62 @@ const AuthLayoutSingInRoute = AuthLayoutSingInRouteImport.update({
 export interface FileRoutesByFullPath {
   '/sing-in': typeof AuthLayoutSingInRoute
   '/sing-up': typeof AuthLayoutSingUpRoute
+  '/home': typeof HomeLayoutHomeRoute
 }
 export interface FileRoutesByTo {
   '/sing-in': typeof AuthLayoutSingInRoute
   '/sing-up': typeof AuthLayoutSingUpRoute
+  '/home': typeof HomeLayoutHomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth/_layout': typeof AuthLayoutRouteWithChildren
+  '/_home/_layout': typeof HomeLayoutRouteWithChildren
   '/_auth/_layout/sing-in': typeof AuthLayoutSingInRoute
   '/_auth/_layout/sing-up': typeof AuthLayoutSingUpRoute
+  '/_home/_layout/home': typeof HomeLayoutHomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/sing-in' | '/sing-up'
+  fullPaths: '/sing-in' | '/sing-up' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sing-in' | '/sing-up'
+  to: '/sing-in' | '/sing-up' | '/home'
   id:
     | '__root__'
     | '/_auth/_layout'
+    | '/_home/_layout'
     | '/_auth/_layout/sing-in'
     | '/_auth/_layout/sing-up'
+    | '/_home/_layout/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
+  HomeLayoutRoute: typeof HomeLayoutRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_home/_layout': {
+      id: '/_home/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof HomeLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_auth/_layout': {
       id: '/_auth/_layout'
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthLayoutRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_home/_layout/home': {
+      id: '/_home/_layout/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeLayoutHomeRouteImport
+      parentRoute: typeof HomeLayoutRoute
     }
     '/_auth/_layout/sing-up': {
       id: '/_auth/_layout/sing-up'
@@ -98,8 +130,21 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
   AuthLayoutRouteChildren,
 )
 
+interface HomeLayoutRouteChildren {
+  HomeLayoutHomeRoute: typeof HomeLayoutHomeRoute
+}
+
+const HomeLayoutRouteChildren: HomeLayoutRouteChildren = {
+  HomeLayoutHomeRoute: HomeLayoutHomeRoute,
+}
+
+const HomeLayoutRouteWithChildren = HomeLayoutRoute._addFileChildren(
+  HomeLayoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthLayoutRoute: AuthLayoutRouteWithChildren,
+  HomeLayoutRoute: HomeLayoutRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
