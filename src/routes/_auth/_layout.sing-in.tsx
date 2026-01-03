@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useForm, type FieldErrors } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { ErrorForm } from '@/components/ui/error-form';
@@ -10,6 +10,8 @@ import { useMutation } from '@tanstack/react-query';
 import { authenticateUser } from '@/api/authenticate-uset';
 import { Eye, EyeOff, FileText, Lock, Mail } from 'lucide-react';
 import { useState } from 'react';
+import { AxiosError } from 'axios';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/_auth/_layout/sing-in')({
   component: RouteComponent,
@@ -41,20 +43,32 @@ function RouteComponent() {
 
   const handleSingIn = async (data: SingInForm) => {
     try {
-      const response = await authenticateUserMutation({
+      await authenticateUserMutation({
         email: data.email,
         password: data.password,
       });
-      console.log(response.data);
       reset();
       navigate({ to: '..' });
     } catch (error) {
-      console.log(error);
-    }
-  };
+      if (error instanceof AxiosError) {
+        if (error.code === 'ERR_NETWORK') {
+          toast.error(
+            'Não foi possível conectar ao servidor. Verifique sua conexão com a internet.'
+          );
+          return;
+        }
 
-  const handleErrors = (errors: FieldErrors<SingInForm>) => {
-    console.log(errors);
+        if (error.response?.status === 401) {
+          toast.error('Credenciais inválidas. Por favor, tente novamente.');
+          return;
+        }
+
+        toast.error(
+          'Ocorreu um erro ao tentar entrar. Tente novamente mais tarde.'
+        );
+        return;
+      }
+    }
   };
 
   return (
@@ -74,7 +88,7 @@ function RouteComponent() {
       </p>
 
       <form
-        onSubmit={handleSubmit(handleSingIn, handleErrors)}
+        onSubmit={handleSubmit(handleSingIn)}
         className="flex flex-col gap-4 mt-10"
       >
         <div className="flex flex-col gap-2">
