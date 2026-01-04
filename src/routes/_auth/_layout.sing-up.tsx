@@ -3,10 +3,9 @@ import { Button } from '@/components/ui/button';
 import { ErrorForm } from '@/components/ui/error-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useUserStore } from '@/store/user-store';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, Link, Navigate } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Eye, EyeOff, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -25,7 +24,6 @@ const singInSchema = z.object({
 type SingInForm = z.infer<typeof singInSchema>;
 
 function RouteComponent() {
-  const { user } = useUserStore();
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const [userAlreadyExists, setUserAlreadyExists] = useState(false);
@@ -55,10 +53,6 @@ function RouteComponent() {
       console.log(error);
     }
   };
-
-  if (user) {
-    return <Navigate to="/home" />;
-  }
 
   return (
     <div className="w-11/12 max-w-md mx-auto shadow p-6 rounded-lg">

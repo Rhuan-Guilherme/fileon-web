@@ -1,12 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  createFileRoute,
-  Link,
-  Navigate,
-  useNavigate,
-} from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
@@ -32,7 +27,7 @@ type SingInForm = z.infer<typeof singInSchema>;
 
 function RouteComponent() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { setUser, user } = useUserStore();
+  const { setUser } = useUserStore();
   const navigate = useNavigate();
 
   const {
@@ -78,10 +73,6 @@ function RouteComponent() {
       }
     }
   };
-
-  if (user) {
-    return <Navigate to="/home" />;
-  }
 
   return (
     <div className="w-11/12 max-w-md mx-auto shadow p-6 rounded-lg ">
