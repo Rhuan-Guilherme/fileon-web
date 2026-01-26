@@ -25,6 +25,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useMutation } from '@tanstack/react-query';
+import { logoutUser } from '@/api/logout-user';
+import { useEffect } from 'react';
+import { useUserStore } from '@/store/user-store';
 
 export function NavUser({
   user,
@@ -38,8 +42,16 @@ export function NavUser({
   } | null;
 }) {
   const { isMobile } = useSidebar();
+  const { clearUser } = useUserStore();
+  const { mutateAsync: logoutMutate, isSuccess } = useMutation({
+    mutationFn: logoutUser,
+  });
 
-  console.log('NavUser user:', user);
+  useEffect(() => {
+    if (isSuccess) {
+      clearUser();
+    }
+  }, [clearUser, isSuccess]);
 
   return (
     <SidebarMenu>
@@ -112,9 +124,9 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => logoutMutate()}>
               <LogOut />
-              Log out
+              Sair
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
