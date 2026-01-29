@@ -18,7 +18,7 @@ export async function authSessionUser() {
     clearUser();
     console.log(error, 'Error fetching session user');
     throw redirect({
-      to: '/sing-in',
+      to: '/sign-in',
     });
   }
 }

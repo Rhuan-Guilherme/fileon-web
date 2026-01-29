@@ -52,7 +52,7 @@ export function NavUser({
   useEffect(() => {
     if (isSuccess) {
       clearUser();
-      navigate({ to: '/sing-in' });
+      navigate({ to: '/sign-in' });
     }
   }, [clearUser, isSuccess, navigate]);
 

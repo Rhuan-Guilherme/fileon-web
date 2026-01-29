@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as HomeLayoutRouteImport } from './routes/_home/_layout'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/_layout'
 import { Route as HomeLayoutHomeRouteImport } from './routes/_home/_layout.home'
-import { Route as AuthLayoutSingUpRouteImport } from './routes/_auth/_layout.sing-up'
-import { Route as AuthLayoutSingInRouteImport } from './routes/_auth/_layout.sing-in'
+import { Route as AuthLayoutSignUpRouteImport } from './routes/_auth/_layout.sign-up'
+import { Route as AuthLayoutSignInRouteImport } from './routes/_auth/_layout.sign-in'
 
 const HomeLayoutRoute = HomeLayoutRouteImport.update({
   id: '/_home/_layout',
@@ -28,46 +28,46 @@ const HomeLayoutHomeRoute = HomeLayoutHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => HomeLayoutRoute,
 } as any)
-const AuthLayoutSingUpRoute = AuthLayoutSingUpRouteImport.update({
-  id: '/sing-up',
-  path: '/sing-up',
+const AuthLayoutSignUpRoute = AuthLayoutSignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
-const AuthLayoutSingInRoute = AuthLayoutSingInRouteImport.update({
-  id: '/sing-in',
-  path: '/sing-in',
+const AuthLayoutSignInRoute = AuthLayoutSignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/sing-in': typeof AuthLayoutSingInRoute
-  '/sing-up': typeof AuthLayoutSingUpRoute
+  '/sign-in': typeof AuthLayoutSignInRoute
+  '/sign-up': typeof AuthLayoutSignUpRoute
   '/home': typeof HomeLayoutHomeRoute
 }
 export interface FileRoutesByTo {
-  '/sing-in': typeof AuthLayoutSingInRoute
-  '/sing-up': typeof AuthLayoutSingUpRoute
+  '/sign-in': typeof AuthLayoutSignInRoute
+  '/sign-up': typeof AuthLayoutSignUpRoute
   '/home': typeof HomeLayoutHomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth/_layout': typeof AuthLayoutRouteWithChildren
   '/_home/_layout': typeof HomeLayoutRouteWithChildren
-  '/_auth/_layout/sing-in': typeof AuthLayoutSingInRoute
-  '/_auth/_layout/sing-up': typeof AuthLayoutSingUpRoute
+  '/_auth/_layout/sign-in': typeof AuthLayoutSignInRoute
+  '/_auth/_layout/sign-up': typeof AuthLayoutSignUpRoute
   '/_home/_layout/home': typeof HomeLayoutHomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/sing-in' | '/sing-up' | '/home'
+  fullPaths: '/sign-in' | '/sign-up' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sing-in' | '/sing-up' | '/home'
+  to: '/sign-in' | '/sign-up' | '/home'
   id:
     | '__root__'
     | '/_auth/_layout'
     | '/_home/_layout'
-    | '/_auth/_layout/sing-in'
-    | '/_auth/_layout/sing-up'
+    | '/_auth/_layout/sign-in'
+    | '/_auth/_layout/sign-up'
     | '/_home/_layout/home'
   fileRoutesById: FileRoutesById
 }
@@ -99,31 +99,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeLayoutHomeRouteImport
       parentRoute: typeof HomeLayoutRoute
     }
-    '/_auth/_layout/sing-up': {
-      id: '/_auth/_layout/sing-up'
-      path: '/sing-up'
-      fullPath: '/sing-up'
-      preLoaderRoute: typeof AuthLayoutSingUpRouteImport
+    '/_auth/_layout/sign-up': {
+      id: '/_auth/_layout/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof AuthLayoutSignUpRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
-    '/_auth/_layout/sing-in': {
-      id: '/_auth/_layout/sing-in'
-      path: '/sing-in'
-      fullPath: '/sing-in'
-      preLoaderRoute: typeof AuthLayoutSingInRouteImport
+    '/_auth/_layout/sign-in': {
+      id: '/_auth/_layout/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof AuthLayoutSignInRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
   }
 }
 
 interface AuthLayoutRouteChildren {
-  AuthLayoutSingInRoute: typeof AuthLayoutSingInRoute
-  AuthLayoutSingUpRoute: typeof AuthLayoutSingUpRoute
+  AuthLayoutSignInRoute: typeof AuthLayoutSignInRoute
+  AuthLayoutSignUpRoute: typeof AuthLayoutSignUpRoute
 }
 
 const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
-  AuthLayoutSingInRoute: AuthLayoutSingInRoute,
-  AuthLayoutSingUpRoute: AuthLayoutSingUpRoute,
+  AuthLayoutSignInRoute: AuthLayoutSignInRoute,
+  AuthLayoutSignUpRoute: AuthLayoutSignUpRoute,
 }
 
 const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(

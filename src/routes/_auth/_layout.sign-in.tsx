@@ -20,7 +20,7 @@ import {
   FieldSeparator,
 } from '@/components/ui/field';
 
-export const Route = createFileRoute('/_auth/_layout/sing-in')({
+export const Route = createFileRoute('/_auth/_layout/sign-in')({
   component: RouteComponent,
 });
 
@@ -175,7 +175,7 @@ function RouteComponent() {
           </Button>
         </Field>
         <FieldDescription className="text-center">
-          Não tem uma conta? <Link to="/sing-up">Cadastre-se</Link>
+          Não tem uma conta? <Link to="/sign-up">Cadastre-se</Link>
         </FieldDescription>
       </FieldGroup>
     </form>

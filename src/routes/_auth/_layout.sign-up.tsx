@@ -17,7 +17,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
-export const Route = createFileRoute('/_auth/_layout/sing-up')({
+export const Route = createFileRoute('/_auth/_layout/sign-up')({
   component: RouteComponent,
 });
 
@@ -167,7 +167,7 @@ function RouteComponent() {
           </Button>
         </Field>
         <FieldDescription className="text-center">
-          Já tem uma conta? <Link to="/sing-in">Entre aqui</Link>
+          Já tem uma conta? <Link to="/sign-in">Entre aqui</Link>
         </FieldDescription>
       </FieldGroup>
     </form>
