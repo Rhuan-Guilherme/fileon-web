@@ -29,6 +29,7 @@ import { useMutation } from '@tanstack/react-query';
 import { logoutUser } from '@/api/logout-user';
 import { useEffect } from 'react';
 import { useUserStore } from '@/store/user-store';
+import { useNavigate } from '@tanstack/react-router';
 
 export function NavUser({
   user,
@@ -41,6 +42,7 @@ export function NavUser({
     updatedAt: Date;
   } | null;
 }) {
+  const navigate = useNavigate();
   const { isMobile } = useSidebar();
   const { clearUser } = useUserStore();
   const { mutateAsync: logoutMutate, isSuccess } = useMutation({
@@ -50,8 +52,9 @@ export function NavUser({
   useEffect(() => {
     if (isSuccess) {
       clearUser();
+      navigate({ to: '/sing-in' });
     }
-  }, [clearUser, isSuccess]);
+  }, [clearUser, isSuccess, navigate]);
 
   return (
     <SidebarMenu>

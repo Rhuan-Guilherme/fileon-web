@@ -63,7 +63,6 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUserStore();
-  console.log(user);
 
   return (
     <Sidebar collapsible="icon" {...props}>

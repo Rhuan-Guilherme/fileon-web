@@ -13,20 +13,18 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { useUserStore } from '@/store/user-store';
-import { createFileRoute, Navigate } from '@tanstack/react-router';
+import { authSessionUser } from '@/hooks/auth-session-user';
+
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_home/_layout')({
   component: RouteComponent,
+  beforeLoad: async () => {
+    await authSessionUser();
+  },
 });
 
 function RouteComponent() {
-  const { user } = useUserStore();
-
-  if (!user) {
-    return <Navigate to="/sing-in" />;
-  }
-
   return (
     <SidebarProvider>
       <AppSidebar />

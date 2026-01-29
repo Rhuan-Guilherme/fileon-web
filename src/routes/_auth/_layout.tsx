@@ -1,21 +1,18 @@
-import { useUserStore } from '@/store/user-store';
-import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { FieldDescription } from '@/components/ui/field';
+import { requireGuest } from '@/hooks/auth-session-user';
 
 export const Route = createFileRoute('/_auth/_layout')({
   component: RouteComponent,
+  beforeLoad: async () => {
+    await requireGuest();
+  },
 });
 
 function RouteComponent({ className, ...props }: React.ComponentProps<'div'>) {
-  const { user } = useUserStore();
-
-  if (user) {
-    return <Navigate to="/home" />;
-  }
-
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-4xl">

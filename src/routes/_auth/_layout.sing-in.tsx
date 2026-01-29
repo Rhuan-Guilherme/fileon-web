@@ -57,7 +57,7 @@ function RouteComponent() {
       });
       setUser(response.data);
       reset();
-      navigate({ to: '..' });
+      navigate({ to: '/home' });
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.code === 'ERR_NETWORK') {
