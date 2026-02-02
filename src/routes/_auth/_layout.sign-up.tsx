@@ -1,4 +1,4 @@
-import { registerUser } from '@/api/register-user';
+import { registerUser } from '@/api/user/register-user';
 import { Button } from '@/components/ui/button';
 import { ErrorForm } from '@/components/ui/error-form';
 import {

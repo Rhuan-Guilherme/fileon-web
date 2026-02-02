@@ -26,7 +26,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useMutation } from '@tanstack/react-query';
-import { logoutUser } from '@/api/logout-user';
+import { logoutUser } from '@/api/user/logout-user';
 import { useEffect } from 'react';
 import { useUserStore } from '@/store/user-store';
 import { useNavigate } from '@tanstack/react-router';
@@ -45,6 +45,7 @@ export function NavUser({
   const navigate = useNavigate();
   const { isMobile } = useSidebar();
   const { clearUser } = useUserStore();
+
   const { mutateAsync: logoutMutate, isSuccess } = useMutation({
     mutationFn: logoutUser,
   });

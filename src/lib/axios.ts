@@ -12,7 +12,7 @@ export const api = axios.create({
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 api.interceptors.request.use(async (config) => {
-  await delay(1000);
+  await delay(500);
 
   return config;
 });

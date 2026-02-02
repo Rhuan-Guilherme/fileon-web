@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { ErrorForm } from '@/components/ui/error-form';
 import { useMutation } from '@tanstack/react-query';
-import { authenticateUser } from '@/api/authenticate-uset';
+import { authenticateUser } from '@/api/user/authenticate-uset';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { AxiosError } from 'axios';

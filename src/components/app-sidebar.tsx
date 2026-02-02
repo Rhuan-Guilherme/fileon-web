@@ -15,6 +15,8 @@ import { NavMain } from './ui/nav-main';
 import { NavProjects } from './ui/nav-project';
 import { NavUser } from './ui/nav-user';
 import { useUserStore } from '@/store/user-store';
+import { useQuery } from '@tanstack/react-query';
+import { getOrganizationsUser } from '@/api/oganization/get-organizations-user';
 
 // This is sample data.
 const data = {
@@ -64,10 +66,16 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUserStore();
 
+  const { data: organizations } = useQuery({
+    queryKey: ['organizationsUser'],
+    queryFn: getOrganizationsUser,
+  });
+  console.log(organizations?.data);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        {organizations && <TeamSwitcher teams={organizations?.data || []} />}
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

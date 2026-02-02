@@ -1,4 +1,4 @@
-import { getSessionUser } from '@/api/session-user';
+import { getSessionUser } from '@/api/user/session-user';
 import { useUserStore } from '@/store/user-store';
 import { isRedirect, redirect } from '@tanstack/react-router';
 
