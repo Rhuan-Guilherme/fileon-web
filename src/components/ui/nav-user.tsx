@@ -1,9 +1,9 @@
 'use client';
 
 import {
-  BadgeCheck,
   Bell,
   ChevronsUpDown,
+  CircleUserIcon,
   CreditCard,
   LogOut,
   Sparkles,
@@ -108,22 +108,22 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Sparkles />
-                Upgrade to Pro
+                Recursos Premium
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+                <CircleUserIcon />
+                Conta
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />
-                Billing
+                Assinaturas
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />
-                Notifications
+                Notificações
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

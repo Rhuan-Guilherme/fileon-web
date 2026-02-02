@@ -25,9 +25,9 @@ const data = {
   },
   teams: [
     {
-      name: 'Acme Inc',
+      name: 'FileOn Inc.',
       logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
+      plan: '10 membros',
     },
   ],
   navMain: [
