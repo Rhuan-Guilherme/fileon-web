@@ -16,6 +16,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Link } from '@tanstack/react-router';
+import { formatCNPJ } from '@/lib/format-cnpj';
 
 export function TeamSwitcher({
   teams,
@@ -23,9 +24,9 @@ export function TeamSwitcher({
   teams: {
     id: string;
     name: string;
+    cnpj: string;
     createdAt: Date;
-    status: 'ACTIVE' | 'INACTIVE';
-    userId: string;
+    slug: string;
   }[];
 }) {
   const { isMobile } = useSidebar();
@@ -55,8 +56,14 @@ export function TeamSwitcher({
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Organizações
+              {teams[0]?.name}
             </DropdownMenuLabel>
+
+            <DropdownMenuItem asChild>
+              <div className="font-medium text-sm">
+                CNPJ: {formatCNPJ(teams[0]?.cnpj)}
+              </div>
+            </DropdownMenuItem>
 
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
@@ -68,7 +75,7 @@ export function TeamSwitcher({
                   <Cog className="size-4" />
                 </div>
                 <div className="text-muted-foreground font-medium">
-                  Gerenciar Organizações
+                  Gerenciar Organização
                 </div>
               </Link>
             </DropdownMenuItem>

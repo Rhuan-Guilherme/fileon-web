@@ -6,6 +6,14 @@ type User = {
   email: string;
   createdAt: Date;
   updatedAt: Date;
+  tenant: {
+    id: string;
+    name: string;
+    cnpj: string;
+    slug: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
 };
 
 type UserStore = {

@@ -72,10 +72,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           teams={[
             {
               createdAt: new Date(),
-              id: '1',
-              name: 'FileOn Inc.',
-              status: 'ACTIVE',
-              userId: '1',
+              id: user?.tenant?.id || '',
+              name: user?.tenant?.name || '',
+              cnpj: user?.tenant?.cnpj || '',
+              slug: user?.tenant?.slug || '',
             },
           ]}
         />
