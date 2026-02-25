@@ -24,28 +24,58 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ErrorForm } from '../ui/error-form';
 import { AlertTriangle } from 'lucide-react';
 import { Separator } from '../ui/separator';
+import { useMutation } from '@tanstack/react-query';
+import { registerUser } from '@/api/user/register-user';
+import { useUserStore } from '@/store/user-store';
+import { toast } from 'sonner';
+import { AxiosError } from 'axios';
 
 const userCreateSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório'),
   email: z.email('Email inválido'),
-  cpf: z.string().optional(),
+  cpf: z.string(),
   role: z.enum(['ADMIN', 'GERENTE', 'CORRESPONDENTE', 'CORRETOR']),
 });
 
 type UserCreateFormData = z.infer<typeof userCreateSchema>;
 
 export function CreateUserTenantDialog() {
+  const { user } = useUserStore();
   const {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm<UserCreateFormData>({
     resolver: zodResolver(userCreateSchema),
   });
 
+  const { mutateAsync: registerUserMutate, isPending } = useMutation({
+    mutationFn: registerUser,
+    onSuccess: () => {
+      reset();
+      toast.success('Usuário criado com sucesso!');
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 409) {
+          toast.error(error.response.data.error);
+          return;
+        }
+      }
+    },
+  });
+
   const handleCreateUser = (data: UserCreateFormData) => {
-    console.log('Criar usuário com os dados:', data);
+    registerUserMutate({
+      name: data.name,
+      email: data.email,
+      password: data.cpf.slice(-4),
+      cpf: data.cpf,
+      role: data.role,
+      tenantId: user!.tenant.id,
+    });
   };
 
   return (
@@ -136,7 +166,9 @@ export function CreateUserTenantDialog() {
           <DialogClose asChild>
             <Button variant="outline">Cancelar</Button>
           </DialogClose>
-          <Button type="submit">Prosseguir</Button>
+          <Button type="submit" disabled={isPending}>
+            Prosseguir
+          </Button>
         </DialogFooter>
       </form>
     </DialogContent>

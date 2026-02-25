@@ -31,6 +31,11 @@ const singInSchema = z.object({
 type SingInForm = z.infer<typeof singInSchema>;
 
 function RouteComponent() {
+  const [createdTenant, setCreatedTenant] = useState<{
+    name: string;
+    slug: string;
+  } | null>(null);
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const [userAlreadyExists, setUserAlreadyExists] = useState(false);
@@ -54,18 +59,44 @@ function RouteComponent() {
 
   const handleSingIn = async (data: SingInForm) => {
     try {
-      await registerTenantMutation({
+      const response = await registerTenantMutation({
         cnpj: data.cnpj.replace(/\D/g, ''),
         name: data.name,
         adminEmail: data.adminEmail,
         adminPassword: data.adminPassword,
       });
       setUserAlreadyExists(false);
+      setCreatedTenant(response.data.tenant);
+      console.log(response.data.tenant);
     } catch (error) {
       setUserAlreadyExists(true);
       console.log(error);
     }
   };
+
+  if (createdTenant) {
+    const domain = `${createdTenant.slug}.lvh.me:5173`;
+
+    return (
+      <div className="p-8 flex flex-col gap-6 text-center">
+        <h1 className="text-2xl font-bold">
+          🎉 Organização criada com sucesso!
+        </h1>
+
+        <p>
+          Sua empresa <strong>{createdTenant.name}</strong> foi criada.
+        </p>
+
+        <div className="bg-muted p-3 rounded-md font-mono text-sm">
+          http://{domain}
+        </div>
+
+        <Button asChild>
+          <a href={`http://${domain}/sign-in`}>Acessar minha empresa</a>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <form className="p-6 md:p-8" onSubmit={handleSubmit(handleSingIn)}>
