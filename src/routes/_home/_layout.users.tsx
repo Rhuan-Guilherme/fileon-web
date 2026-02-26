@@ -31,24 +31,39 @@ import {
   UserLock,
 } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createFileRoute } from '@tanstack/react-router';
 import { UserRoundPlus } from 'lucide-react';
+import { invalidateUser } from '@/api/user/inativate-user';
+import { queryClient } from '@/lib/query-client';
+import { activeUser } from '@/api/user/active-user';
 
 export const Route = createFileRoute('/_home/_layout/users')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { user } = useUserStore();
+  const { user: usersAlt } = useUserStore();
 
   const { data: response } = useQuery<UsersByTenantResponse>({
     queryKey: ['usersTenantKey'],
-    queryFn: () => findUsersByTenant(user!.tenant.id),
+    queryFn: () => findUsersByTenant(usersAlt!.tenant.id),
   });
 
-  console.log('response', response);
+  const { mutateAsync: invalidateUserMutation } = useMutation({
+    mutationFn: invalidateUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['usersTenantKey'] });
+    },
+  });
+
+  const { mutateAsync: activeUserMutation } = useMutation({
+    mutationFn: activeUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['usersTenantKey'] });
+    },
+  });
 
   return (
     <div className="mt-6 p-2">
@@ -153,14 +168,41 @@ function RouteComponent() {
                       </DropdownMenuItem>
 
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem variant="destructive">
-                        <UserLock />
+
+                      <DropdownMenuItem
+                        className="text-emerald-400 cursor-pointer"
+                        onClick={() => {
+                          activeUserMutation({
+                            tenantId: user.tenantId,
+                            tenantOperator: usersAlt!.tenant.id,
+                            userId: user.id,
+                          });
+                        }}
+                      >
+                        <UserLock className="text-emerald-400" />
+                        Ativar usuário
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        className="text-rose-400 cursor-pointer"
+                        onClick={() => {
+                          invalidateUserMutation({
+                            tenantId: user.tenantId,
+                            tenantOperator: usersAlt!.tenant.id,
+                            userId: user.id,
+                          });
+                        }}
+                      >
+                        <UserLock className="text-rose-400" />
                         Inativar usuário
                       </DropdownMenuItem>
+
+                      {/* <DropdownMenuSeparator />
+
                       <DropdownMenuItem variant="destructive">
                         <Trash2 />
                         Excluir usuário
-                      </DropdownMenuItem>
+                      </DropdownMenuItem> */}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

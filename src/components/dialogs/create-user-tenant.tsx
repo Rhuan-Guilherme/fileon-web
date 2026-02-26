@@ -29,6 +29,7 @@ import { registerUser } from '@/api/user/register-user';
 import { useUserStore } from '@/store/user-store';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
+import { queryClient } from '@/lib/query-client';
 
 const userCreateSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório'),
@@ -53,8 +54,10 @@ export function CreateUserTenantDialog() {
 
   const { mutateAsync: registerUserMutate, isPending } = useMutation({
     mutationFn: registerUser,
+
     onSuccess: () => {
       reset();
+      queryClient.invalidateQueries({ queryKey: ['usersTenantKey'] });
       toast.success('Usuário criado com sucesso!');
     },
     onError: (error) => {
