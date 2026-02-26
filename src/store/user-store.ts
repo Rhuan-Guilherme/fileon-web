@@ -6,6 +6,7 @@ type User = {
   email: string;
   createdAt: Date;
   updatedAt: Date;
+  tenantId: string;
   tenant: {
     id: string;
     name: string;

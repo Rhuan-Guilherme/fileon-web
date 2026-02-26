@@ -68,17 +68,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher
-          teams={[
-            {
-              createdAt: new Date(),
-              id: user?.tenant?.id || '',
-              name: user?.tenant?.name || '',
-              cnpj: user?.tenant?.cnpj || '',
-              slug: user?.tenant?.slug || '',
-            },
-          ]}
-        />
+        {user && (
+          <TeamSwitcher
+            teams={[
+              {
+                createdAt: new Date(),
+                id: user?.tenant?.id || '',
+                name: user?.tenant?.name || '',
+                cnpj: user?.tenant?.cnpj || '',
+                slug: user?.tenant?.slug || '',
+              },
+            ]}
+          />
+        )}
       </SidebarHeader>
       <SidebarContent>
         <NavManagement />

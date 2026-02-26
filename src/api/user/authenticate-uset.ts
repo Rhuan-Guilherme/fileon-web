@@ -5,9 +5,16 @@ interface AuthenticateUserRequest {
   password: string;
 }
 
-export function authenticateUser({ email, password }: AuthenticateUserRequest) {
-  return api.post('/user/authenticate', {
+export async function authenticateUser({
+  email,
+  password,
+}: AuthenticateUserRequest) {
+  const response = await api.post('/user/authenticate', {
     email,
     password,
   });
+
+  console.log(response);
+
+  return response;
 }

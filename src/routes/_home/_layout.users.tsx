@@ -23,13 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  LockKeyhole,
-  MoreVertical,
-  Trash2,
-  UserIcon,
-  UserLock,
-} from 'lucide-react';
+import { LockKeyhole, MoreVertical, UserIcon, UserLock } from 'lucide-react';
 import { useUserStore } from '@/store/user-store';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -46,22 +40,51 @@ export const Route = createFileRoute('/_home/_layout/users')({
 function RouteComponent() {
   const { user: usersAlt } = useUserStore();
 
+  const tenantId = usersAlt?.tenant.id;
+
   const { data: response } = useQuery<UsersByTenantResponse>({
     queryKey: ['usersTenantKey'],
-    queryFn: () => findUsersByTenant(usersAlt!.tenant.id),
+    queryFn: () => findUsersByTenant(tenantId!),
+    enabled: !!tenantId,
   });
 
   const { mutateAsync: invalidateUserMutation } = useMutation({
     mutationFn: invalidateUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['usersTenantKey'] });
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData<UsersByTenantResponse | undefined>(
+        ['usersTenantKey'],
+        (prev) => {
+          if (!prev) return prev;
+
+          return {
+            ...prev,
+            users: prev.users.map((u) =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              u.id === (variables as any).userId ? { ...u, status: false } : u
+            ),
+          };
+        }
+      );
     },
   });
 
   const { mutateAsync: activeUserMutation } = useMutation({
     mutationFn: activeUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['usersTenantKey'] });
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData<UsersByTenantResponse | undefined>(
+        ['usersTenantKey'],
+        (prev) => {
+          if (!prev) return prev;
+
+          return {
+            ...prev,
+            users: prev.users.map((u) =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              u.id === (variables as any).userId ? { ...u, status: true } : u
+            ),
+          };
+        }
+      );
     },
   });
 
