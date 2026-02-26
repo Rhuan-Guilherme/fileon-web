@@ -30,6 +30,7 @@ import { useUserStore } from '@/store/user-store';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
 import { queryClient } from '@/lib/query-client';
+import { formatCPF } from '@/lib/format-cnpj';
 
 const userCreateSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório'),
@@ -129,7 +130,25 @@ export function CreateUserTenantDialog() {
           </Field>
           <Field>
             <Label htmlFor="cpf">CPF</Label>
-            <Input {...register('cpf')} id="cpf" name="cpf" />
+            <Controller
+              name="cpf"
+              control={control}
+              defaultValue={''}
+              render={({ field }) => (
+                <Input
+                  id="cpf"
+                  name="cpf"
+                  value={formatCPF(field.value ?? '')}
+                  onChange={(e) => {
+                    const digits = e.target.value
+                      .replace(/\D/g, '')
+                      .slice(0, 11);
+                    field.onChange(digits);
+                  }}
+                />
+              )}
+            />
+
             {errors && errors.cpf?.message && (
               <ErrorForm message={errors.cpf.message} />
             )}

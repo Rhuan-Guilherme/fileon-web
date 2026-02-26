@@ -88,11 +88,11 @@ function RouteComponent() {
         </p>
 
         <div className="bg-muted p-3 rounded-md font-mono text-sm">
-          http://{domain}
+          https://{domain}
         </div>
 
         <Button asChild>
-          <a href={`http://${domain}/sign-in`}>Acessar minha empresa</a>
+          <a href={`https://${domain}/sign-in`}>Acessar minha empresa</a>
         </Button>
       </div>
     );

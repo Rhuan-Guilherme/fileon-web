@@ -14,7 +14,5 @@ export async function authenticateUser({
     password,
   });
 
-  console.log(response);
-
   return response;
 }

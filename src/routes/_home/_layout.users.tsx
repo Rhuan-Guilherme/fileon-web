@@ -119,7 +119,7 @@ function RouteComponent() {
             </TableRow>
           </TableHeader>
 
-          <TableBody className="bg-neutral-900">
+          <TableBody className="dark:bg-neutral-900">
             {response?.users.map((user) => (
               <TableRow key={user.id}>
                 {/* Usuário */}
@@ -192,33 +192,35 @@ function RouteComponent() {
 
                       <DropdownMenuSeparator />
 
-                      <DropdownMenuItem
-                        className="text-emerald-400 cursor-pointer"
-                        onClick={() => {
-                          activeUserMutation({
-                            tenantId: user.tenantId,
-                            tenantOperator: usersAlt!.tenant.id,
-                            userId: user.id,
-                          });
-                        }}
-                      >
-                        <UserLock className="text-emerald-400" />
-                        Ativar usuário
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        className="text-rose-400 cursor-pointer"
-                        onClick={() => {
-                          invalidateUserMutation({
-                            tenantId: user.tenantId,
-                            tenantOperator: usersAlt!.tenant.id,
-                            userId: user.id,
-                          });
-                        }}
-                      >
-                        <UserLock className="text-rose-400" />
-                        Inativar usuário
-                      </DropdownMenuItem>
+                      {user.status ? (
+                        <DropdownMenuItem
+                          className="text-rose-400 cursor-pointer"
+                          onClick={() => {
+                            invalidateUserMutation({
+                              tenantId: user.tenantId,
+                              tenantOperator: usersAlt!.tenant.id,
+                              userId: user.id,
+                            });
+                          }}
+                        >
+                          <UserLock className="text-rose-400" />
+                          Inativar usuário
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem
+                          className="text-emerald-400 cursor-pointer"
+                          onClick={() => {
+                            activeUserMutation({
+                              tenantId: user.tenantId,
+                              tenantOperator: usersAlt!.tenant.id,
+                              userId: user.id,
+                            });
+                          }}
+                        >
+                          <UserLock className="text-emerald-400" />
+                          Ativar usuário
+                        </DropdownMenuItem>
+                      )}
 
                       {/* <DropdownMenuSeparator />
 

@@ -71,6 +71,18 @@ function RouteComponent() {
           return;
         }
 
+        if (error.response?.status === 423) {
+          navigate({
+            to: '/alter-password',
+            search: {
+              email: data.email,
+              currentPassword: data.password,
+            },
+          });
+          toast.error('Troque a sua senha para acessar a plataforma. ');
+          return;
+        }
+
         if (error.response?.status === 403 || error.response?.status === 400) {
           toast.error(
             'Não foi possível identificar sua empresa pelo domínio utilizado. Verifique se você está acessando a plataforma pelo endereço correto fornecido pela sua empresa.'

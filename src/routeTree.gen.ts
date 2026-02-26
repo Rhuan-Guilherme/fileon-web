@@ -16,6 +16,7 @@ import { Route as HomeLayoutOrganizationRouteImport } from './routes/_home/_layo
 import { Route as HomeLayoutHomeRouteImport } from './routes/_home/_layout.home'
 import { Route as AuthLayoutSignUpRouteImport } from './routes/_auth/_layout.sign-up'
 import { Route as AuthLayoutSignInRouteImport } from './routes/_auth/_layout.sign-in'
+import { Route as AuthLayoutAlterPasswordRouteImport } from './routes/_auth/_layout.alter-password'
 
 const HomeLayoutRoute = HomeLayoutRouteImport.update({
   id: '/_home/_layout',
@@ -50,8 +51,14 @@ const AuthLayoutSignInRoute = AuthLayoutSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
+const AuthLayoutAlterPasswordRoute = AuthLayoutAlterPasswordRouteImport.update({
+  id: '/alter-password',
+  path: '/alter-password',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/alter-password': typeof AuthLayoutAlterPasswordRoute
   '/sign-in': typeof AuthLayoutSignInRoute
   '/sign-up': typeof AuthLayoutSignUpRoute
   '/home': typeof HomeLayoutHomeRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof HomeLayoutUsersRoute
 }
 export interface FileRoutesByTo {
+  '/alter-password': typeof AuthLayoutAlterPasswordRoute
   '/sign-in': typeof AuthLayoutSignInRoute
   '/sign-up': typeof AuthLayoutSignUpRoute
   '/home': typeof HomeLayoutHomeRoute
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth/_layout': typeof AuthLayoutRouteWithChildren
   '/_home/_layout': typeof HomeLayoutRouteWithChildren
+  '/_auth/_layout/alter-password': typeof AuthLayoutAlterPasswordRoute
   '/_auth/_layout/sign-in': typeof AuthLayoutSignInRoute
   '/_auth/_layout/sign-up': typeof AuthLayoutSignUpRoute
   '/_home/_layout/home': typeof HomeLayoutHomeRoute
@@ -77,13 +86,26 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/sign-in' | '/sign-up' | '/home' | '/organization' | '/users'
+  fullPaths:
+    | '/alter-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/home'
+    | '/organization'
+    | '/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sign-in' | '/sign-up' | '/home' | '/organization' | '/users'
+  to:
+    | '/alter-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/home'
+    | '/organization'
+    | '/users'
   id:
     | '__root__'
     | '/_auth/_layout'
     | '/_home/_layout'
+    | '/_auth/_layout/alter-password'
     | '/_auth/_layout/sign-in'
     | '/_auth/_layout/sign-up'
     | '/_home/_layout/home'
@@ -147,15 +169,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutSignInRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
+    '/_auth/_layout/alter-password': {
+      id: '/_auth/_layout/alter-password'
+      path: '/alter-password'
+      fullPath: '/alter-password'
+      preLoaderRoute: typeof AuthLayoutAlterPasswordRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
   }
 }
 
 interface AuthLayoutRouteChildren {
+  AuthLayoutAlterPasswordRoute: typeof AuthLayoutAlterPasswordRoute
   AuthLayoutSignInRoute: typeof AuthLayoutSignInRoute
   AuthLayoutSignUpRoute: typeof AuthLayoutSignUpRoute
 }
 
 const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
+  AuthLayoutAlterPasswordRoute: AuthLayoutAlterPasswordRoute,
   AuthLayoutSignInRoute: AuthLayoutSignInRoute,
   AuthLayoutSignUpRoute: AuthLayoutSignUpRoute,
 }
