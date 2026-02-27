@@ -1,15 +1,21 @@
 import { api } from '@/lib/axios';
 
+export const PROCESS_STATUS = {
+  NOVO: 'NOVO',
+  EM_ANDAMENTO: 'EM_ANDAMENTO',
+  FINALIZADO: 'FINALIZADO',
+  CANCELADO: 'CANCELADO',
+  DOCUMENTACAO_PENDENTE: 'DOCUMENTACAO_PENDENTE',
+  DOCUMENTACAO_COMPLETA: 'DOCUMENTACAO_COMPLETA',
+  EM_ANALISE: 'EM_ANALISE',
+} as const;
+
+export type ProcessStatus =
+  (typeof PROCESS_STATUS)[keyof typeof PROCESS_STATUS];
+
 interface FindProcessByTenantParams {
   name?: string;
-  status?:
-    | 'NOVO'
-    | 'EM_ANDAMENTO'
-    | 'FINALIZADO'
-    | 'CANCELADO'
-    | 'DOCUMENTACAO_PENDENTE'
-    | 'DOCUMENTACAO_COMPLETA'
-    | 'EM_ANALISE';
+  status?: ProcessStatus;
   perPage?: number;
   page?: number;
 }
