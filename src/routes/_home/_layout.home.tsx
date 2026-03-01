@@ -28,10 +28,11 @@ import {
   findProcessByTenant,
   PROCESS_STATUS,
 } from '@/api/processes/find-process-by-tenant';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { ProcessDetailsDialog } from '@/components/dialogs/info-process';
 import { BadgeStatus } from '@/components/ui/badge-status';
+import { CreateProcessDialog } from '@/components/dialogs/create-process';
 
 export type ProcessStatus =
   (typeof PROCESS_STATUS)[keyof typeof PROCESS_STATUS];
@@ -39,10 +40,18 @@ export type ProcessStatus =
 type ProcessSchema = {
   id: string;
   name: string;
-  description?: string;
   status: ProcessStatus;
   createdAt: string;
-  data?: Record<string, unknown>;
+  participants: {
+    id: string;
+    type: string;
+    person?: {
+      id: string;
+      name: string;
+      cpf: string;
+      phone: string;
+    };
+  }[];
 };
 
 export const Route = createFileRoute('/_home/_layout/home')({
@@ -133,10 +142,15 @@ function RouteComponent() {
           </div>
         </div>
 
-        <Button className="w-full md:w-auto">
-          <FilePlusCorner />
-          Criar novo processo
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="w-full md:w-auto">
+              <FilePlusCorner />
+              Criar novo processo
+            </Button>
+          </DialogTrigger>
+          <CreateProcessDialog />
+        </Dialog>
       </div>
       <div className="rounded-2xl border shadow-sm">
         <Table>
@@ -144,7 +158,7 @@ function RouteComponent() {
             <TableRow>
               <TableHead></TableHead>
               <TableHead>Nome</TableHead>
-              <TableHead>Descrição</TableHead>
+              <TableHead>Cliente</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Criado em</TableHead>
               <TableHead></TableHead>
@@ -170,7 +184,13 @@ function RouteComponent() {
 
                   <TableCell className="font-medium">{process.name}</TableCell>
 
-                  <TableCell>{process.description ?? '-'}</TableCell>
+                  <TableCell>
+                    {process.participants?.map((p) => {
+                      if (p.type === 'COMPRADOR') {
+                        return p.person?.name;
+                      }
+                    }) ?? '-'}
+                  </TableCell>
 
                   <TableCell>
                     <BadgeStatus status={process.status} />
