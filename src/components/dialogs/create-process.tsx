@@ -21,9 +21,14 @@ import {
 } from '../ui/select';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { createProcess } from '@/api/processes/create-process';
+import { useUserStore } from '@/store/user-store';
+import { toast } from 'sonner';
+import { queryClient } from '@/lib/query-client';
 
 const createProcessSchema = z.object({
-  typeProperty: z.string().min(1, 'O tipo do imóvel é obrigatório'),
+  typeProperty: z.enum(['PLANTA', 'NOVO', 'INDIVIDUAL']),
   name: z.string().min(1, 'O nome do empreendimento é obrigatório'),
   clientName: z.string().min(1, 'O nome do cliente é obrigatório'),
   vgv: z.string().min(1, 'O VGV é obrigatório'),
@@ -32,17 +37,41 @@ const createProcessSchema = z.object({
 type CreateProcessFormData = z.infer<typeof createProcessSchema>;
 
 export function CreateProcessDialog() {
+  const { user } = useUserStore();
+
   const {
+    handleSubmit,
     register,
     control,
+    reset,
     formState: { errors },
   } = useForm<CreateProcessFormData>({
     resolver: zodResolver(createProcessSchema),
   });
 
+  const { mutateAsync: createProcessMutate } = useMutation({
+    mutationFn: createProcess,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['processes'] });
+      toast.success('Processo criado com sucesso!');
+      reset();
+    },
+  });
+
+  const handleCreateProcess = async (data: CreateProcessFormData) => {
+    const response = await createProcessMutate({
+      name: data.name,
+      clientName: data.clientName,
+      processType: data.typeProperty,
+      tenantId: user!.tenant.id,
+    });
+
+    console.log(response);
+  };
+
   return (
     <DialogContent>
-      <form action="">
+      <form action="" onSubmit={handleSubmit(handleCreateProcess)}>
         <DialogTitle>Novo processo:</DialogTitle>
         <FieldGroup className="mt-10">
           <Field>
@@ -60,10 +89,10 @@ export function CreateProcessDialog() {
                   <SelectContent position="popper">
                     <SelectGroup>
                       <SelectLabel>Tipo do imóvel:</SelectLabel>
-                      <SelectItem value="ADMIN">Imóvel na planta</SelectItem>
-                      <SelectItem value="ADMIN">Imóvel na novo</SelectItem>
-                      <SelectItem value="ADMIN">
-                        Imóvel na individual
+                      <SelectItem value="PLANTA">Imóvel na planta</SelectItem>
+                      <SelectItem value="NOVO">Imóvel novo</SelectItem>
+                      <SelectItem value="INDIVIDUAL">
+                        Imóvel individual
                       </SelectItem>
                     </SelectGroup>
                   </SelectContent>
@@ -106,7 +135,7 @@ export function CreateProcessDialog() {
             )}
           </Field>
         </FieldGroup>
-        <DialogFooter className='mt-5'>
+        <DialogFooter className="mt-5">
           <DialogClose asChild>
             <Button variant="outline">Cancelar</Button>
           </DialogClose>

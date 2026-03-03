@@ -2,23 +2,25 @@ import { api } from '@/lib/axios';
 
 interface CreateProcessParams {
   name: string;
-  description: string;
   tenantId: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data?: any;
+  processType: 'PLANTA' | 'NOVO' | 'INDIVIDUAL';
+  clientName: string;
+  vgv?: string;
 }
 
 export async function createProcess({
-  description,
   name,
   tenantId,
-  data,
+  processType,
+  clientName,
+  vgv,
 }: CreateProcessParams) {
   const process = await api.post('/processes', {
     name,
-    description,
     tenantId,
-    data,
+    processType,
+    clientName,
+    vgv,
   });
 
   return process.data;

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 
 import {
   Select,
@@ -204,9 +204,14 @@ function RouteComponent() {
                   </TableCell>
 
                   <TableCell className="text-right">
-                    <Button size="sm" variant="outline">
-                      <ArrowRight />
-                    </Button>
+                    <Link
+                      to={`/process/$processId`}
+                      params={{ processId: process.id }}
+                    >
+                      <Button size="sm" variant="outline">
+                        <ArrowRight />
+                      </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}

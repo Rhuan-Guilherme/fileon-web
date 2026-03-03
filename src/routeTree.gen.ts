@@ -17,6 +17,7 @@ import { Route as HomeLayoutHomeRouteImport } from './routes/_home/_layout.home'
 import { Route as AuthLayoutSignUpRouteImport } from './routes/_auth/_layout.sign-up'
 import { Route as AuthLayoutSignInRouteImport } from './routes/_auth/_layout.sign-in'
 import { Route as AuthLayoutAlterPasswordRouteImport } from './routes/_auth/_layout.alter-password'
+import { Route as HomeLayoutProcessProcessIdRouteImport } from './routes/_home/_layout.process.$processId'
 
 const HomeLayoutRoute = HomeLayoutRouteImport.update({
   id: '/_home/_layout',
@@ -56,6 +57,12 @@ const AuthLayoutAlterPasswordRoute = AuthLayoutAlterPasswordRouteImport.update({
   path: '/alter-password',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
+const HomeLayoutProcessProcessIdRoute =
+  HomeLayoutProcessProcessIdRouteImport.update({
+    id: '/process/$processId',
+    path: '/process/$processId',
+    getParentRoute: () => HomeLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/alter-password': typeof AuthLayoutAlterPasswordRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeLayoutHomeRoute
   '/organization': typeof HomeLayoutOrganizationRoute
   '/users': typeof HomeLayoutUsersRoute
+  '/process/$processId': typeof HomeLayoutProcessProcessIdRoute
 }
 export interface FileRoutesByTo {
   '/alter-password': typeof AuthLayoutAlterPasswordRoute
@@ -72,6 +80,7 @@ export interface FileRoutesByTo {
   '/home': typeof HomeLayoutHomeRoute
   '/organization': typeof HomeLayoutOrganizationRoute
   '/users': typeof HomeLayoutUsersRoute
+  '/process/$processId': typeof HomeLayoutProcessProcessIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -83,6 +92,7 @@ export interface FileRoutesById {
   '/_home/_layout/home': typeof HomeLayoutHomeRoute
   '/_home/_layout/organization': typeof HomeLayoutOrganizationRoute
   '/_home/_layout/users': typeof HomeLayoutUsersRoute
+  '/_home/_layout/process/$processId': typeof HomeLayoutProcessProcessIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -93,6 +103,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/organization'
     | '/users'
+    | '/process/$processId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/alter-password'
@@ -101,6 +112,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/organization'
     | '/users'
+    | '/process/$processId'
   id:
     | '__root__'
     | '/_auth/_layout'
@@ -111,6 +123,7 @@ export interface FileRouteTypes {
     | '/_home/_layout/home'
     | '/_home/_layout/organization'
     | '/_home/_layout/users'
+    | '/_home/_layout/process/$processId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutAlterPasswordRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
+    '/_home/_layout/process/$processId': {
+      id: '/_home/_layout/process/$processId'
+      path: '/process/$processId'
+      fullPath: '/process/$processId'
+      preLoaderRoute: typeof HomeLayoutProcessProcessIdRouteImport
+      parentRoute: typeof HomeLayoutRoute
+    }
   }
 }
 
@@ -199,12 +219,14 @@ interface HomeLayoutRouteChildren {
   HomeLayoutHomeRoute: typeof HomeLayoutHomeRoute
   HomeLayoutOrganizationRoute: typeof HomeLayoutOrganizationRoute
   HomeLayoutUsersRoute: typeof HomeLayoutUsersRoute
+  HomeLayoutProcessProcessIdRoute: typeof HomeLayoutProcessProcessIdRoute
 }
 
 const HomeLayoutRouteChildren: HomeLayoutRouteChildren = {
   HomeLayoutHomeRoute: HomeLayoutHomeRoute,
   HomeLayoutOrganizationRoute: HomeLayoutOrganizationRoute,
   HomeLayoutUsersRoute: HomeLayoutUsersRoute,
+  HomeLayoutProcessProcessIdRoute: HomeLayoutProcessProcessIdRoute,
 }
 
 const HomeLayoutRouteWithChildren = HomeLayoutRoute._addFileChildren(
