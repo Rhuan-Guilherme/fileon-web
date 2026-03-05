@@ -9,7 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as InviteIdRouteImport } from './routes/invite/$id'
+import { Route as InviteTokenRouteImport } from './routes/invite/$token'
 import { Route as HomeLayoutRouteImport } from './routes/_home/_layout'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/_layout'
 import { Route as HomeLayoutUsersRouteImport } from './routes/_home/_layout.users'
@@ -20,9 +20,9 @@ import { Route as AuthLayoutSignInRouteImport } from './routes/_auth/_layout.sig
 import { Route as AuthLayoutAlterPasswordRouteImport } from './routes/_auth/_layout.alter-password'
 import { Route as HomeLayoutProcessProcessIdRouteImport } from './routes/_home/_layout.process.$processId'
 
-const InviteIdRoute = InviteIdRouteImport.update({
-  id: '/invite/$id',
-  path: '/invite/$id',
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeLayoutRoute = HomeLayoutRouteImport.update({
@@ -71,7 +71,7 @@ const HomeLayoutProcessProcessIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/invite/$id': typeof InviteIdRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/alter-password': typeof AuthLayoutAlterPasswordRoute
   '/sign-in': typeof AuthLayoutSignInRoute
   '/sign-up': typeof AuthLayoutSignUpRoute
@@ -81,7 +81,7 @@ export interface FileRoutesByFullPath {
   '/process/$processId': typeof HomeLayoutProcessProcessIdRoute
 }
 export interface FileRoutesByTo {
-  '/invite/$id': typeof InviteIdRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/alter-password': typeof AuthLayoutAlterPasswordRoute
   '/sign-in': typeof AuthLayoutSignInRoute
   '/sign-up': typeof AuthLayoutSignUpRoute
@@ -94,7 +94,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth/_layout': typeof AuthLayoutRouteWithChildren
   '/_home/_layout': typeof HomeLayoutRouteWithChildren
-  '/invite/$id': typeof InviteIdRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/_auth/_layout/alter-password': typeof AuthLayoutAlterPasswordRoute
   '/_auth/_layout/sign-in': typeof AuthLayoutSignInRoute
   '/_auth/_layout/sign-up': typeof AuthLayoutSignUpRoute
@@ -106,7 +106,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/invite/$id'
+    | '/invite/$token'
     | '/alter-password'
     | '/sign-in'
     | '/sign-up'
@@ -116,7 +116,7 @@ export interface FileRouteTypes {
     | '/process/$processId'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/invite/$id'
+    | '/invite/$token'
     | '/alter-password'
     | '/sign-in'
     | '/sign-up'
@@ -128,7 +128,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_auth/_layout'
     | '/_home/_layout'
-    | '/invite/$id'
+    | '/invite/$token'
     | '/_auth/_layout/alter-password'
     | '/_auth/_layout/sign-in'
     | '/_auth/_layout/sign-up'
@@ -141,16 +141,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
   HomeLayoutRoute: typeof HomeLayoutRouteWithChildren
-  InviteIdRoute: typeof InviteIdRoute
+  InviteTokenRoute: typeof InviteTokenRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/invite/$id': {
-      id: '/invite/$id'
-      path: '/invite/$id'
-      fullPath: '/invite/$id'
-      preLoaderRoute: typeof InviteIdRouteImport
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_home/_layout': {
@@ -256,7 +256,7 @@ const HomeLayoutRouteWithChildren = HomeLayoutRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthLayoutRoute: AuthLayoutRouteWithChildren,
   HomeLayoutRoute: HomeLayoutRouteWithChildren,
-  InviteIdRoute: InviteIdRoute,
+  InviteTokenRoute: InviteTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,11 +1,16 @@
 import { findProcess, type Process } from '@/api/processes/find-process';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow, isPast } from 'date-fns';
 import { BadgeStatus } from '@/components/ui/badge-status';
+import { Button } from '@/components/ui/button';
+import { InviteParticipant } from '@/api/participant/invite-participant';
+import { queryClient } from '@/lib/query-client';
+import { toast } from 'sonner';
+import { ptBR } from 'date-fns/locale/pt-BR';
 
 export const Route = createFileRoute('/_home/_layout/process/$processId')({
   component: RouteComponent,
@@ -17,6 +22,16 @@ function RouteComponent() {
   const { data, isLoading } = useQuery<Process>({
     queryKey: ['process', processId],
     queryFn: () => findProcess(processId),
+  });
+
+  const {
+    mutateAsync: inviteParticipantMutate,
+    isPending: isInviteParticipantPending,
+  } = useMutation({
+    mutationFn: (participantId: string) => InviteParticipant(participantId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['process', processId] });
+    },
   });
 
   if (isLoading) {
@@ -111,12 +126,27 @@ function RouteComponent() {
                   {participant.person ? 'Vinculado' : 'Sem pessoa'}
                 </Badge>
               </div>
-
               <Separator />
-
-              {participant.person ? (
+              {participant.company && participant.company.companyName ? (
                 <div className="text-sm space-y-1">
-                  <Info label="Nome" value={participant.person.name} />
+                  <Info
+                    label="Nome da empresa"
+                    value={participant.company.companyName ?? '—'}
+                  />
+                  <Info
+                    label="Email"
+                    value={participant.company.email ?? '—'}
+                  />
+                  <Info
+                    label="Telefone"
+                    value={participant.company.phone ?? '—'}
+                  />
+                  <Info label="CNPJ" value={participant.company.cnpj ?? '—'} />
+                </div>
+              ) : null}
+              {participant.person && (
+                <div className="text-sm space-y-1">
+                  <Info label="Nome" value={participant.person.name ?? '—'} />
                   <Info label="Email" value={participant.person.email ?? '—'} />
                   <Info
                     label="Telefone"
@@ -124,10 +154,66 @@ function RouteComponent() {
                   />
                   <Info label="CPF" value={participant.person.cpf ?? '—'} />
                 </div>
+              )}
+              <p className="text-xs text-muted-foreground mt-5">
+                Link para encaminhar dados do processo:
+              </p>
+
+              {participant.participantInvites.length ? (
+                (() => {
+                  const token = participant.participantInvites[0]?.token;
+                  const inviteLink = token
+                    ? `https://lvh.me:5173/invite/${token}`
+                    : null;
+
+                  async function handleCopy() {
+                    if (!inviteLink) return;
+                    await navigator.clipboard.writeText(inviteLink);
+                    toast.success('Link copiado para a área de transferência!');
+                  }
+
+                  const expiresAt =
+                    participant.participantInvites[0]?.expiresAt;
+
+                  if (!expiresAt)
+                    return (
+                      <span className="text-sm text-muted-foreground">—</span>
+                    );
+
+                  const date = new Date(expiresAt);
+                  const expired = isPast(date);
+
+                  return (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleCopy}
+                      >
+                        Copiar link
+                      </Button>
+                      <span
+                        className={`text-sm ${
+                          expired ? 'text-red-500' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {expired
+                          ? 'Expirado'
+                          : `Expira em ${formatDistanceToNow(date, {
+                              addSuffix: false,
+                              locale: ptBR,
+                            })}`}
+                      </span>
+                    </div>
+                  );
+                })()
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  Nenhuma pessoa vinculada.
-                </p>
+                <Button
+                  onClick={() => inviteParticipantMutate(participant.id)}
+                  disabled={isInviteParticipantPending}
+                >
+                  Gerar link
+                </Button>
               )}
             </div>
           ))}
