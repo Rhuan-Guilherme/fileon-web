@@ -71,6 +71,13 @@ function RouteComponent() {
           return;
         }
 
+        if (error.response?.status === 403) {
+          toast.error(
+            'Conta bloqueada. Entre em contato com o suporte da sua empresa.'
+          );
+          return;
+        }
+
         if (error.response?.status === 423) {
           navigate({
             to: '/alter-password',
@@ -83,7 +90,7 @@ function RouteComponent() {
           return;
         }
 
-        if (error.response?.status === 403 || error.response?.status === 400) {
+        if (error.response?.status === 405 || error.response?.status === 400) {
           toast.error(
             'Não foi possível identificar sua empresa pelo domínio utilizado. Verifique se você está acessando a plataforma pelo endereço correto fornecido pela sua empresa.'
           );

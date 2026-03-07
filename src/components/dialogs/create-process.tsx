@@ -59,14 +59,12 @@ export function CreateProcessDialog() {
   });
 
   const handleCreateProcess = async (data: CreateProcessFormData) => {
-    const response = await createProcessMutate({
+    await createProcessMutate({
       name: data.name,
       clientName: data.clientName,
       processType: data.typeProperty,
       tenantId: user!.tenant.id,
     });
-
-    console.log(response);
   };
 
   return (
