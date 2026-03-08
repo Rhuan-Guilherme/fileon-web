@@ -52,6 +52,11 @@ type ProcessSchema = {
       phone: string;
     };
   }[];
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
 };
 
 export const Route = createFileRoute('/_home/_layout/home')({
@@ -157,19 +162,20 @@ function RouteComponent() {
           <TableHeader>
             <TableRow>
               <TableHead></TableHead>
-              <TableHead>Nome</TableHead>
+              <TableHead>Nome do processo</TableHead>
               <TableHead>Cliente</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Criado em</TableHead>
+              <TableHead>Criado por</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
 
-          <TableBody className="text-muted-foreground text-sm">
+          <TableBody className="text-muted-foreground text-sm ">
             {data &&
               data.processes.map((process: ProcessSchema) => (
                 <TableRow key={process.id}>
-                  <TableCell>
+                  <TableCell className="">
                     <Button
                       variant="secondary"
                       size="sm"
@@ -202,6 +208,8 @@ function RouteComponent() {
                       locale: ptBR,
                     })}
                   </TableCell>
+
+                  <TableCell>{process.user.name.split(' ')[0]}</TableCell>
 
                   <TableCell className="text-right">
                     <Link

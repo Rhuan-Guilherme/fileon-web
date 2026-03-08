@@ -100,10 +100,7 @@ function RouteComponent() {
               label="Criado em"
               value={format(new Date(data.createdAt), 'dd/MM/yyyy HH:mm')}
             />
-            <Info
-              label="Atualizado em"
-              value={format(new Date(data.updatedAt), 'dd/MM/yyyy HH:mm')}
-            />
+            <Info label="Criado por" value={data.user.name.split(' ')[0]} />
           </div>
         </CardContent>
       </Card>

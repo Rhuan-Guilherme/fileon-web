@@ -67,6 +67,12 @@ export interface Participant {
   participantInvites: ParticipantInvite[];
 }
 
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
 export interface Process {
   id: string;
   tenantId: string;
@@ -77,6 +83,7 @@ export interface Process {
   createdAt: string;
   updatedAt: string;
   participants: Participant[];
+  user: User;
 }
 
 export async function findProcess(processId: string) {
