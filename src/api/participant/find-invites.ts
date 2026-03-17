@@ -27,9 +27,19 @@ type InviteParticipant = {
     updatedAt: string;
     companyRepresentatives: Array<{
       id: string;
-      name: string;
-      email: string;
-      phone: string;
+      companyId: string;
+      personId: string;
+      createdAt: string;
+      updatedAt: string;
+      person: {
+        id: string;
+        name: string;
+        cpf: string | null;
+        email: string | null;
+        phone: string | null;
+        createdAt: string;
+        updatedAt: string;
+      } | null;
     }>;
   } | null;
 };

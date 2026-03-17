@@ -1,3 +1,7 @@
+import {
+  updateCompany,
+  type UpdateCompanyData,
+} from '@/api/company/update-company';
 import { findInvites } from '@/api/participant/find-invites';
 import {
   updatePerson,
@@ -72,13 +76,17 @@ function formatCPF(value: string) {
     .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
 }
 
+function formatRepresentativeName(representative: {
+  person?: { name: string } | null;
+  personId: string;
+}) {
+  return (
+    representative.person?.name || `Representante (${representative.personId})`
+  );
+}
+
 function RouteComponent() {
   const { id } = Route.useParams();
-
-  const { data, isPending, isError } = useQuery({
-    queryKey: ['invite', id],
-    queryFn: () => findInvites(id),
-  });
 
   const {
     control,
@@ -97,6 +105,11 @@ function RouteComponent() {
       email: '',
       phone: '',
     },
+  });
+
+  const { data, isPending, isError } = useQuery({
+    queryKey: ['invite', id],
+    queryFn: () => findInvites(id),
   });
 
   useEffect(() => {
@@ -128,6 +141,11 @@ function RouteComponent() {
     data: UpdatePersonData;
   };
 
+  type UpdateCompanyVariables = {
+    companyId: string;
+    data: UpdateCompanyData;
+  };
+
   const { mutateAsync: updatePersonMutate } = useMutation({
     mutationFn: ({ data, personId }: UpdatePersonVariables) =>
       updatePerson(personId, data),
@@ -136,6 +154,18 @@ function RouteComponent() {
     },
     onError: () => {
       toast.error('Erro ao atualizar os dados. Tente novamente.');
+    },
+  });
+
+  const { mutateAsync: updateCompanyMutate } = useMutation({
+    mutationFn: ({ companyId, data }: UpdateCompanyVariables) =>
+      updateCompany(companyId, data),
+    onSuccess: () => {
+      toast.success('Dados atualizados com sucesso!');
+    },
+    onError: () => {
+      toast.error('Erro ao atualizar os dados. Tente novamente.');
+      console.log('Erro ao atualizar empresa', { data });
     },
   });
 
@@ -151,6 +181,19 @@ function RouteComponent() {
         data: {
           name: formData.name,
           cpf: formData.cpf || null,
+          email: formData.email,
+          phone: formData.phone,
+        },
+      });
+    }
+
+    if (data.participant.companyId) {
+      console.log(formData);
+      await updateCompanyMutate({
+        companyId: data.participant.companyId!,
+        data: {
+          companyName: formData.name,
+          cnpj: formData.cnpj || null,
           email: formData.email,
           phone: formData.phone,
         },
@@ -199,6 +242,8 @@ function RouteComponent() {
     'Convidado(a)';
   const participantType = participant.type.toLowerCase();
   const isCompanyParticipant = participantKind === 'company';
+  const companyRepresentatives =
+    participant.company?.companyRepresentatives ?? [];
 
   return (
     <main className="min-h-dvh bg-linear-to-br from-background via-background to-muted/40 px-4 py-10">
@@ -323,6 +368,42 @@ function RouteComponent() {
                     <ErrorForm message={errors.phone.message} />
                   )}
                 </Field>
+
+                {participant.company && (
+                  <div className="rounded-lg border bg-muted/30 p-4">
+                    <p className="text-sm font-medium text-foreground">
+                      Representantes vinculados
+                    </p>
+
+                    {companyRepresentatives.length > 0 ? (
+                      <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                        {companyRepresentatives.map((representative) => (
+                          <li
+                            className="rounded-md border border-border/60 bg-background/80 px-3 py-2 space-y-1"
+                            key={representative.id}
+                          >
+                            <p className="font-medium text-foreground">
+                              {formatRepresentativeName(representative)}
+                            </p>
+                            {representative.person?.email && (
+                              <p>Email: {representative.person.email}</p>
+                            )}
+                            {representative.person?.phone && (
+                              <p>Telefone: {representative.person.phone}</p>
+                            )}
+                            {representative.person?.cpf && (
+                              <p>CPF: {representative.person.cpf}</p>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Nenhum representante cadastrado para esta empresa.
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Salvando...' : 'Salvar'}
