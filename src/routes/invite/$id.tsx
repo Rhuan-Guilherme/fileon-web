@@ -7,6 +7,7 @@ import {
   updatePerson,
   type UpdatePersonData,
 } from '@/api/participant/update-person';
+import { createPersonInParticipant } from '@/api/person/create-person-in-participant';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -169,6 +170,17 @@ function RouteComponent() {
     },
   });
 
+  const { mutateAsync: createPersonInParticipantMutate } = useMutation({
+    mutationFn: ({ personId, data }: UpdatePersonVariables) =>
+      createPersonInParticipant(personId, data),
+    onSuccess: () => {
+      toast.success('Dados atualizados com sucesso!');
+    },
+    onError: () => {
+      toast.error('Erro ao atualizar os dados. Tente novamente.');
+    },
+  });
+
   const handleCompleteInvite = async (formData: InviteFormData) => {
     if (!data?.participant) {
       toast.error('Dados do convite não estão disponíveis');
@@ -194,6 +206,18 @@ function RouteComponent() {
         data: {
           companyName: formData.name,
           cnpj: formData.cnpj || null,
+          email: formData.email,
+          phone: formData.phone,
+        },
+      });
+    }
+
+    if (!data.participant.companyId && !data.participant.personId) {
+      await createPersonInParticipantMutate({
+        personId: data.participant.id,
+        data: {
+          name: formData.name,
+          cpf: formData.cpf || null,
           email: formData.email,
           phone: formData.phone,
         },
