@@ -212,11 +212,58 @@ function RouteComponent() {
                   Gerar link
                 </Button>
               )}
+
+              {participant.company && (
+                <div className="rounded-lg border bg-muted/30 p-4">
+                  <p className="text-sm font-medium text-foreground">
+                    Representantes vinculados
+                  </p>
+
+                  {participant.company.companyRepresentatives.length > 0 ? (
+                    <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                      {participant.company.companyRepresentatives.map(
+                        (representative) => (
+                          <li
+                            className="rounded-md border border-border/60 bg-background/80 px-3 py-2 space-y-1"
+                            key={representative.id}
+                          >
+                            <p className="font-medium text-foreground">
+                              {formatRepresentativeName(representative)}
+                            </p>
+                            {representative.person?.email && (
+                              <p>Email: {representative.person.email}</p>
+                            )}
+                            {representative.person?.phone && (
+                              <p>Telefone: {representative.person.phone}</p>
+                            )}
+                            {representative.person?.cpf && (
+                              <p>CPF: {representative.person.cpf}</p>
+                            )}
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  ) : (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Nenhum representante cadastrado para esta empresa.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function formatRepresentativeName(representative: {
+  person?: { name: string } | null;
+  personId: string;
+}) {
+  return (
+    representative.person?.name || `Representante (${representative.personId})`
   );
 }
 
