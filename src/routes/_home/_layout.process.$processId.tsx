@@ -43,23 +43,32 @@ function RouteComponent() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="min-h-dvh bg-linear-to-br from-background via-muted/20 to-background p-4 md:p-6 space-y-6">
       {/* Cabeçalho */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">{data.name}</h1>
+      <div className="rounded-2xl border border-border/60 bg-background/90 p-4 md:p-5 shadow-sm">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Detalhes do processo
+            </p>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+              {data.name}
+            </h1>
+          </div>
 
-        <div className="flex gap-2">
-          <BadgeStatus status={data.status} />
+          <div className="flex gap-2">
+            <BadgeStatus status={data.status} />
+          </div>
         </div>
       </div>
 
       {/* Card Principal */}
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>Informações do Processo</CardTitle>
+      <Card className="rounded-2xl border-border/70 bg-background/95 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">Informações do Processo</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             <Info
               label="Tipo de imóvel"
               value={
@@ -106,26 +115,28 @@ function RouteComponent() {
       </Card>
 
       {/* Participantes */}
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>Participantes</CardTitle>
+      <Card className="rounded-2xl border-border/70 bg-background/95 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">Participantes</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           {data.participants.map((participant) => (
             <div
               key={participant.id}
-              className="p-4 border rounded-xl space-y-2"
+              className="rounded-2xl border border-border/70 bg-linear-to-br from-background to-muted/20 p-5 space-y-4 shadow-sm"
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium">{participant.type}</span>
+                <span className="font-semibold tracking-wide text-foreground">
+                  {participant.type}
+                </span>
                 <Badge variant="outline">
                   {participant.person ? 'Vinculado' : 'Sem pessoa'}
                 </Badge>
               </div>
               <Separator />
               {participant.company && participant.company.companyName ? (
-                <div className="text-sm space-y-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Info
                     label="Nome da empresa"
                     value={participant.company.companyName ?? '—'}
@@ -142,7 +153,7 @@ function RouteComponent() {
                 </div>
               ) : null}
               {participant.person && (
-                <div className="text-sm space-y-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Info label="Nome" value={participant.person.name ?? '—'} />
                   <Info label="Email" value={participant.person.email ?? '—'} />
                   <Info
@@ -152,69 +163,75 @@ function RouteComponent() {
                   <Info label="CPF" value={participant.person.cpf ?? '—'} />
                 </div>
               )}
-              <p className="text-xs text-muted-foreground mt-5">
-                Link para encaminhar dados do processo:
-              </p>
+              <div className="rounded-xl border border-border/60 bg-background/80 px-4 py-3 space-y-2">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Link para encaminhar dados do processo
+                </p>
 
-              {participant.participantInvites.length ? (
-                (() => {
-                  const token = participant.participantInvites[0]?.token;
-                  const inviteLink = token
-                    ? `https://lvh.me:5173/invite/${token}`
-                    : null;
+                {participant.participantInvites.length ? (
+                  (() => {
+                    const token = participant.participantInvites[0]?.token;
+                    const inviteLink = token
+                      ? `https://lvh.me:5173/invite/${token}`
+                      : null;
 
-                  async function handleCopy() {
-                    if (!inviteLink) return;
-                    await navigator.clipboard.writeText(inviteLink);
-                    toast.success('Link copiado para a área de transferência!');
-                  }
+                    async function handleCopy() {
+                      if (!inviteLink) return;
+                      await navigator.clipboard.writeText(inviteLink);
+                      toast.success(
+                        'Link copiado para a área de transferência!'
+                      );
+                    }
 
-                  const expiresAt =
-                    participant.participantInvites[0]?.expiresAt;
+                    const expiresAt =
+                      participant.participantInvites[0]?.expiresAt;
 
-                  if (!expiresAt)
+                    if (!expiresAt)
+                      return (
+                        <span className="text-sm text-muted-foreground">—</span>
+                      );
+
+                    const date = new Date(expiresAt);
+                    const expired = isPast(date);
+
                     return (
-                      <span className="text-sm text-muted-foreground">—</span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={handleCopy}
+                        >
+                          Copiar link
+                        </Button>
+                        <span
+                          className={`text-sm ${
+                            expired
+                              ? 'text-red-500 font-medium'
+                              : 'text-muted-foreground'
+                          }`}
+                        >
+                          {expired
+                            ? 'Expirado'
+                            : `Expira em ${formatDistanceToNow(date, {
+                                addSuffix: false,
+                                locale: ptBR,
+                              })}`}
+                        </span>
+                      </div>
                     );
-
-                  const date = new Date(expiresAt);
-                  const expired = isPast(date);
-
-                  return (
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={handleCopy}
-                      >
-                        Copiar link
-                      </Button>
-                      <span
-                        className={`text-sm ${
-                          expired ? 'text-red-500' : 'text-muted-foreground'
-                        }`}
-                      >
-                        {expired
-                          ? 'Expirado'
-                          : `Expira em ${formatDistanceToNow(date, {
-                              addSuffix: false,
-                              locale: ptBR,
-                            })}`}
-                      </span>
-                    </div>
-                  );
-                })()
-              ) : (
-                <Button
-                  onClick={() => inviteParticipantMutate(participant.id)}
-                  disabled={isInviteParticipantPending}
-                >
-                  Gerar link
-                </Button>
-              )}
+                  })()
+                ) : (
+                  <Button
+                    onClick={() => inviteParticipantMutate(participant.id)}
+                    disabled={isInviteParticipantPending}
+                  >
+                    Gerar link
+                  </Button>
+                )}
+              </div>
 
               {participant.company && (
-                <div className="rounded-lg border bg-muted/30 p-4">
+                <div className="rounded-xl border border-border/60 bg-muted/40 p-4">
                   <p className="text-sm font-medium text-foreground">
                     Representantes vinculados
                   </p>
@@ -269,9 +286,11 @@ function formatRepresentativeName(representative: {
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <p className="text-muted-foreground text-xs">{label}</p>
-      <p className="font-medium break-all">{value}</p>
+    <div className="rounded-xl border border-border/60 bg-muted/25 px-3 py-2.5">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 font-medium text-foreground break-all">{value}</p>
     </div>
   );
 }
