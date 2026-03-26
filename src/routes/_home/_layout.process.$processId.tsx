@@ -15,6 +15,7 @@ import { InviteParticipant } from '@/api/participant/invite-participant';
 import { queryClient } from '@/lib/query-client';
 import { toast } from 'sonner';
 import { ptBR } from 'date-fns/locale/pt-BR';
+import { ShoppingBag, Store } from 'lucide-react';
 
 export const Route = createFileRoute('/_home/_layout/process/$processId')({
   component: RouteComponent,
@@ -125,20 +126,41 @@ function RouteComponent() {
         </CardHeader>
 
         <CardContent className="space-y-5">
-          {data.participants.map((participant) => (
+          {data.participants.map((participant) => {
+            const isComprador = participant.type === 'COMPRADOR';
+            const TypeIcon = isComprador ? ShoppingBag : Store;
+            return (
             <div
               key={participant.id}
-              className="rounded-2xl border border-border/70 bg-linear-to-br from-background to-muted/20 p-5 space-y-4 shadow-sm"
+              className={`rounded-2xl border p-5 space-y-4 shadow-sm relative overflow-hidden ${
+                isComprador
+                  ? 'border-blue-200/70 dark:border-blue-800/40 bg-linear-to-br from-blue-50/40 via-background to-muted/20 dark:from-blue-950/20'
+                  : 'border-emerald-200/70 dark:border-emerald-800/40 bg-linear-to-br from-emerald-50/40 via-background to-muted/20 dark:from-emerald-950/20'
+              }`}
             >
+              <div
+                className={`absolute left-0 top-0 bottom-0 w-1 ${
+                  isComprador ? 'bg-blue-500' : 'bg-emerald-500'
+                }`}
+              />
               <div className="flex items-center justify-between">
-                <span className="font-semibold tracking-wide text-foreground">
-                  {participant.type}
-                </span>
+                <div
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
+                    isComprador
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
+                      : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                  }`}
+                >
+                  <TypeIcon className="w-4 h-4" />
+                  {isComprador ? 'Comprador' : 'Vendedor'}
+                </div>
                 <Badge variant="outline">
                   {participant.person ? 'Vinculado' : 'Sem pessoa'}
                 </Badge>
               </div>
-              <Separator />
+              <Separator
+                className={isComprador ? 'bg-blue-200/60 dark:bg-blue-800/40' : 'bg-emerald-200/60 dark:bg-emerald-800/40'}
+              />
               {participant.company && participant.company.companyName ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Info
@@ -286,7 +308,8 @@ function RouteComponent() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
     </div>
