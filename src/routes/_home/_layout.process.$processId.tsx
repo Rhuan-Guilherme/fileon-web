@@ -1,4 +1,8 @@
-import { findProcess, type Process } from '@/api/processes/find-process';
+import {
+  findProcess,
+  type ParticipantInvite,
+  type Process,
+} from '@/api/processes/find-process';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -170,7 +174,10 @@ function RouteComponent() {
 
                 {participant.participantInvites.length ? (
                   (() => {
-                    const token = participant.participantInvites[0]?.token;
+                    const latestInvite = getLatestParticipantInvite(
+                      participant.participantInvites
+                    );
+                    const token = latestInvite?.token;
                     const inviteLink = token
                       ? `https://lvh.me:5173/invite/${token}`
                       : null;
@@ -183,8 +190,7 @@ function RouteComponent() {
                       );
                     }
 
-                    const expiresAt =
-                      participant.participantInvites[0]?.expiresAt;
+                    const expiresAt = latestInvite?.expiresAt;
 
                     if (!expiresAt)
                       return (
@@ -196,13 +202,25 @@ function RouteComponent() {
 
                     return (
                       <div className="flex flex-wrap items-center gap-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={handleCopy}
-                        >
-                          Copiar link
-                        </Button>
+                        {!expired ? (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={handleCopy}
+                          >
+                            Copiar link
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() =>
+                              inviteParticipantMutate(participant.id)
+                            }
+                            disabled={isInviteParticipantPending}
+                          >
+                            Gerar link
+                          </Button>
+                        )}
+
                         <span
                           className={`text-sm ${
                             expired
@@ -273,6 +291,16 @@ function RouteComponent() {
       </Card>
     </div>
   );
+}
+
+function getLatestParticipantInvite(invites: ParticipantInvite[]) {
+  if (!invites.length) return null;
+
+  return invites.reduce((latestInvite, currentInvite) => {
+    return new Date(currentInvite.createdAt) > new Date(latestInvite.createdAt)
+      ? currentInvite
+      : latestInvite;
+  });
 }
 
 function formatRepresentativeName(representative: {

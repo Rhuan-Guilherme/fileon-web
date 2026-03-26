@@ -58,6 +58,8 @@ function RouteComponent() {
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showPasswordReset, setShowPasswordReset] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
 
   const { mutateAsync: alterPasswordMutate, isPending } = useMutation({
     mutationFn: alterPassword,
@@ -171,18 +173,28 @@ function RouteComponent() {
           <Input
             {...register('confirmNewPassword')}
             id="confirm-password"
-            type={showPassword ? 'text' : 'password'}
+            type={showConfirmPassword ? 'text' : 'password'}
             placeholder="••••••••"
             required
           />
           {errors && errors.confirmNewPassword?.message && (
             <ErrorForm message={errors.confirmNewPassword.message} />
           )}
+          <div>
+            <button
+              type="button"
+              className="absolute top-1/2 right-2 w-5 h-5 cursor-pointer"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? (
+                <Eye className="w-4 h-4 " />
+              ) : (
+                <EyeOff className="w-4 h-4 " />
+              )}
+            </button>
+          </div>
         </Field>
         <Field>
-          {/* <Button type="submit" disabled={isPending}>
-            {isPending ? 'Entrando...' : 'Acessar a plataforma'}
-          </Button> */}
           <Button type="submit" disabled={isPending}>
             {isPending ? 'Alterando...' : 'Alterar senha e acessar'}
           </Button>

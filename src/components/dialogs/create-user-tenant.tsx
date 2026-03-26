@@ -75,7 +75,7 @@ export function CreateUserTenantDialog() {
     registerUserMutate({
       name: data.name,
       email: data.email,
-      password: data.cpf.slice(-4),
+      password: data.cpf.slice(0, 4),
       cpf: data.cpf,
       role: data.role,
       tenantId: user!.tenant.id,
@@ -97,7 +97,7 @@ export function CreateUserTenantDialog() {
               O usuário criado terá acesso apenas à sua própria organização.
             </li>
             <li>
-              A senha de acesso será os <strong>4 últimos </strong>dígitos do
+              A senha de acesso será os <strong>4 primeiros </strong>dígitos do
               CPF (Alterada apos o primeiro acesso).
             </li>
             <li>

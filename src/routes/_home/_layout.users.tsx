@@ -32,6 +32,8 @@ import { UserRoundPlus } from 'lucide-react';
 import { invalidateUser } from '@/api/user/inativate-user';
 import { queryClient } from '@/lib/query-client';
 import { activeUser } from '@/api/user/active-user';
+import { AxiosError } from 'axios';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/_home/_layout/users')({
   component: RouteComponent,
@@ -66,6 +68,19 @@ function RouteComponent() {
         }
       );
     },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (
+          error.response?.status === 403 &&
+          error.response.data.message ===
+            'User does not have permission for this resource'
+        ) {
+          toast.error(
+            'Você não tem permissão para realizar esta ação. Contate o suporte da sua empresa.'
+          );
+        }
+      }
+    },
   });
 
   const { mutateAsync: activeUserMutation } = useMutation({
@@ -85,6 +100,19 @@ function RouteComponent() {
           };
         }
       );
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (
+          error.response?.status === 403 &&
+          error.response.data.message ===
+            'User does not have permission for this resource'
+        ) {
+          toast.error(
+            'Você não tem permissão para realizar esta ação. Contate o suporte da sua empresa.'
+          );
+        }
+      }
     },
   });
 

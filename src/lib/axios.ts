@@ -30,7 +30,11 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.response.status === 403) {
+    if (
+      (error.response.status === 403 &&
+        error.response.data.message === 'Unauthorized') ||
+      error.response.data.message === 'User is not active'
+    ) {
       toast.error(
         'Conta bloqueada. Entre em contato com o suporte da sua empresa.'
       );
