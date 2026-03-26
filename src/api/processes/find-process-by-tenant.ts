@@ -16,6 +16,8 @@ export type ProcessStatus =
 interface FindProcessByTenantParams {
   name?: string;
   status?: ProcessStatus;
+  dateFrom?: string;
+  dateTo?: string;
   perPage?: number;
   page?: number;
 }

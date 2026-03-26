@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowRight, FilePlusCorner, Search, X } from 'lucide-react';
+import { ArrowRight, Calendar, FilePlusCorner, Search, X } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -33,6 +33,15 @@ import { useState } from 'react';
 import { ProcessDetailsDialog } from '@/components/dialogs/info-process';
 import { BadgeStatus } from '@/components/ui/badge-status';
 import { CreateProcessDialog } from '@/components/dialogs/create-process';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 export type ProcessStatus =
   (typeof PROCESS_STATUS)[keyof typeof PROCESS_STATUS];
@@ -72,6 +81,8 @@ function RouteComponent() {
 
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<ProcessStatus | undefined>(undefined);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const [page, setPage] = useState(1);
 
@@ -84,24 +95,39 @@ function RouteComponent() {
   const { user } = useUserStore();
 
   const { data } = useQuery({
-    queryKey: ['processes', user?.tenant.id, search, status, page],
+    queryKey: [
+      'processes',
+      user?.tenant.id,
+      search,
+      status,
+      page,
+      dateFrom,
+      dateTo,
+    ],
     queryFn: () =>
       findProcessByTenant(user!.tenant.id, {
         name: search || undefined,
         status: status || undefined,
-        perPage: 10,
+        dateFrom: dateFrom || undefined,
+        dateTo: dateTo || undefined,
+        perPage: 13,
         page,
       }),
     enabled: !!user?.tenant.id,
   });
 
+  const totalPages = data ? Math.ceil((data.total ?? 0) / 14) : 1;
+
   return (
     <>
       <div className="flex flex-col-reverse md:flex-row items-center justify-start gap-3 ">
-        <div className="flex flex-col gap-3 w-full sm:flex-row sm:items-end sm:justify-start">
+        <div className="flex flex-col gap-3 w-full sm:flex-row sm:flex-wrap sm:items-end sm:justify-start">
           <Input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="w-full sm:max-w-sm"
             placeholder="Pesquisar por dados do processo..."
           />
@@ -109,7 +135,10 @@ function RouteComponent() {
           <Select
             value={status}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onValueChange={(value) => setStatus(value as any)}
+            onValueChange={(value) => {
+              setStatus(value as any);
+              setPage(1);
+            }}
           >
             <SelectTrigger className="w-full sm:max-w-48">
               <SelectValue placeholder="Status" />
@@ -131,6 +160,31 @@ function RouteComponent() {
             </SelectContent>
           </Select>
 
+          <div className="flex items-center gap-1.5 w-full sm:w-auto rounded-md border border-input bg-background px-3 h-9">
+            <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => {
+                setDateFrom(e.target.value);
+                setPage(1);
+              }}
+              className="bg-transparent text-sm outline-none w-28 text-foreground scheme-light dark:scheme-dark"
+            />
+            <span className="text-muted-foreground text-xs font-medium select-none">
+              —
+            </span>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => {
+                setDateTo(e.target.value);
+                setPage(1);
+              }}
+              className="bg-transparent text-sm outline-none w-28 text-foreground scheme-light dark:scheme-dark"
+            />
+          </div>
+
           <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row">
             <Button
               variant="outline"
@@ -138,6 +192,8 @@ function RouteComponent() {
               onClick={() => {
                 setSearch('');
                 setStatus(undefined);
+                setDateFrom('');
+                setDateTo('');
                 setPage(1);
               }}
             >
@@ -238,6 +294,57 @@ function RouteComponent() {
         </Table>
       </div>
 
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-1">
+          <p className="text-sm text-muted-foreground">
+            {data?.total
+              ? `Página ${page} de ${totalPages} · ${data.total} processos`
+              : `Página ${page} de ${totalPages}`}
+          </p>
+          <Pagination className="w-auto mx-0">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className={
+                    page === 1
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
+                  }
+                />
+              </PaginationItem>
+              {getPageNumbers(page, totalPages).map((pageNum, idx) =>
+                pageNum === null ? (
+                  <PaginationItem key={`ellipsis-${idx}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                ) : (
+                  <PaginationItem key={pageNum}>
+                    <PaginationLink
+                      isActive={pageNum === page}
+                      onClick={() => setPage(pageNum)}
+                      className="cursor-pointer"
+                    >
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              )}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className={
+                    page === totalPages
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <ProcessDetailsDialog
           process={selectedProcess}
@@ -248,4 +355,20 @@ function RouteComponent() {
       </Dialog>
     </>
   );
+}
+
+function getPageNumbers(current: number, total: number): (number | null)[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | null)[] = [1];
+  if (current > 3) pages.push(null);
+  for (
+    let i = Math.max(2, current - 1);
+    i <= Math.min(total - 1, current + 1);
+    i++
+  ) {
+    pages.push(i);
+  }
+  if (current < total - 2) pages.push(null);
+  pages.push(total);
+  return pages;
 }
