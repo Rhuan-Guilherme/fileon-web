@@ -11,7 +11,13 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowRight, Calendar, FilePlusCorner, Search, X } from 'lucide-react';
+import {
+  ArrowRight,
+  CalendarIcon,
+  FilePlusCorner,
+  Search,
+  X,
+} from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -20,7 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useUserStore } from '@/store/user-store';
 import { useQuery } from '@tanstack/react-query';
@@ -33,6 +39,12 @@ import { useState } from 'react';
 import { ProcessDetailsDialog } from '@/components/dialogs/info-process';
 import { BadgeStatus } from '@/components/ui/badge-status';
 import { CreateProcessDialog } from '@/components/dialogs/create-process';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Pagination,
   PaginationContent,
@@ -81,8 +93,8 @@ function RouteComponent() {
 
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<ProcessStatus | undefined>(undefined);
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
   const [page, setPage] = useState(1);
 
@@ -108,8 +120,8 @@ function RouteComponent() {
       findProcessByTenant(user!.tenant.id, {
         name: search || undefined,
         status: status || undefined,
-        dateFrom: dateFrom || undefined,
-        dateTo: dateTo || undefined,
+        dateFrom: dateFrom ? format(dateFrom, 'yyyy-MM-dd') : undefined,
+        dateTo: dateTo ? format(dateTo, 'yyyy-MM-dd') : undefined,
         perPage: 13,
         page,
       }),
@@ -160,29 +172,65 @@ function RouteComponent() {
             </SelectContent>
           </Select>
 
-          <div className="flex items-center gap-1.5 w-full sm:w-auto rounded-md border border-input bg-background px-3 h-9">
-            <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => {
-                setDateFrom(e.target.value);
-                setPage(1);
-              }}
-              className="bg-transparent text-sm outline-none w-28 text-foreground scheme-light dark:scheme-dark"
-            />
-            <span className="text-muted-foreground text-xs font-medium select-none">
-              —
-            </span>
-            <input
-              type="date"
-              value={dateTo}
-              onChange={(e) => {
-                setDateTo(e.target.value);
-                setPage(1);
-              }}
-              className="bg-transparent text-sm outline-none w-28 text-foreground scheme-light dark:scheme-dark"
-            />
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-40 justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                  {dateFrom ? (
+                    format(dateFrom, 'dd/MM/yyyy')
+                  ) : (
+                    <span className="text-muted-foreground">Data inicial</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={(date) => {
+                    setDateFrom(date);
+                    setPage(1);
+                  }}
+                  locale={ptBR}
+                  captionLayout="dropdown"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-muted-foreground text-xs select-none">—</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-40 justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                  {dateTo ? (
+                    format(dateTo, 'dd/MM/yyyy')
+                  ) : (
+                    <span className="text-muted-foreground">Data final</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={(date) => {
+                    setDateTo(date);
+                    setPage(1);
+                  }}
+                  locale={ptBR}
+                  captionLayout="dropdown"
+                  disabled={dateFrom ? { before: dateFrom } : undefined}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row">
@@ -192,8 +240,8 @@ function RouteComponent() {
               onClick={() => {
                 setSearch('');
                 setStatus(undefined);
-                setDateFrom('');
-                setDateTo('');
+                setDateFrom(undefined);
+                setDateTo(undefined);
                 setPage(1);
               }}
             >
