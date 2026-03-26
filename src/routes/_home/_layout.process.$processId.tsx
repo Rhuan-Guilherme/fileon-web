@@ -130,184 +130,196 @@ function RouteComponent() {
             const isComprador = participant.type === 'COMPRADOR';
             const TypeIcon = isComprador ? ShoppingBag : Store;
             return (
-            <div
-              key={participant.id}
-              className={`rounded-2xl border p-5 space-y-4 shadow-sm relative overflow-hidden ${
-                isComprador
-                  ? 'border-blue-200/70 dark:border-blue-800/40 bg-linear-to-br from-blue-50/40 via-background to-muted/20 dark:from-blue-950/20'
-                  : 'border-emerald-200/70 dark:border-emerald-800/40 bg-linear-to-br from-emerald-50/40 via-background to-muted/20 dark:from-emerald-950/20'
-              }`}
-            >
               <div
-                className={`absolute left-0 top-0 bottom-0 w-1 ${
-                  isComprador ? 'bg-blue-500' : 'bg-emerald-500'
+                key={participant.id}
+                className={`rounded-2xl border p-5 space-y-4 shadow-sm relative overflow-hidden ${
+                  isComprador
+                    ? 'border-blue-200/70 dark:border-blue-800/40 bg-linear-to-br from-blue-50/40 via-background to-muted/20 dark:from-blue-950/20'
+                    : 'border-emerald-200/70 dark:border-emerald-800/40 bg-linear-to-br from-emerald-50/40 via-background to-muted/20 dark:from-emerald-950/20'
                 }`}
-              />
-              <div className="flex items-center justify-between">
+              >
                 <div
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
-                    isComprador
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
-                      : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                  className={`absolute left-0 top-0 bottom-0 w-1 ${
+                    isComprador ? 'bg-blue-500' : 'bg-emerald-500'
                   }`}
-                >
-                  <TypeIcon className="w-4 h-4" />
-                  {isComprador ? 'Comprador' : 'Vendedor'}
-                </div>
-                <Badge variant="outline">
-                  {participant.person ? 'Vinculado' : 'Sem pessoa'}
-                </Badge>
-              </div>
-              <Separator
-                className={isComprador ? 'bg-blue-200/60 dark:bg-blue-800/40' : 'bg-emerald-200/60 dark:bg-emerald-800/40'}
-              />
-              {participant.company && participant.company.companyName ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <Info
-                    label="Nome da empresa"
-                    value={participant.company.companyName ?? '—'}
-                  />
-                  <Info
-                    label="Email"
-                    value={participant.company.email ?? '—'}
-                  />
-                  <Info
-                    label="Telefone"
-                    value={participant.company.phone ?? '—'}
-                  />
-                  <Info label="CNPJ" value={participant.company.cnpj ?? '—'} />
-                </div>
-              ) : null}
-              {participant.person && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <Info label="Nome" value={participant.person.name ?? '—'} />
-                  <Info label="Email" value={participant.person.email ?? '—'} />
-                  <Info
-                    label="Telefone"
-                    value={participant.person.phone ?? '—'}
-                  />
-                  <Info label="CPF" value={participant.person.cpf ?? '—'} />
-                </div>
-              )}
-              <div className="rounded-xl border border-border/60 bg-background/80 px-4 py-3 space-y-2">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Link para encaminhar dados do processo
-                </p>
-
-                {participant.participantInvites.length ? (
-                  (() => {
-                    const latestInvite = getLatestParticipantInvite(
-                      participant.participantInvites
-                    );
-                    const token = latestInvite?.token;
-                    const inviteLink = token
-                      ? `https://lvh.me:5173/invite/${token}`
-                      : null;
-
-                    async function handleCopy() {
-                      if (!inviteLink) return;
-                      await navigator.clipboard.writeText(inviteLink);
-                      toast.success(
-                        'Link copiado para a área de transferência!'
-                      );
-                    }
-
-                    const expiresAt = latestInvite?.expiresAt;
-
-                    if (!expiresAt)
-                      return (
-                        <span className="text-sm text-muted-foreground">—</span>
-                      );
-
-                    const date = new Date(expiresAt);
-                    const expired = isPast(date);
-
-                    return (
-                      <div className="flex flex-wrap items-center gap-2">
-                        {!expired ? (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={handleCopy}
-                          >
-                            Copiar link
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={() =>
-                              inviteParticipantMutate(participant.id)
-                            }
-                            disabled={isInviteParticipantPending}
-                          >
-                            Gerar link
-                          </Button>
-                        )}
-
-                        <span
-                          className={`text-sm ${
-                            expired
-                              ? 'text-red-500 font-medium'
-                              : 'text-muted-foreground'
-                          }`}
-                        >
-                          {expired
-                            ? 'Expirado'
-                            : `Expira em ${formatDistanceToNow(date, {
-                                addSuffix: false,
-                                locale: ptBR,
-                              })}`}
-                        </span>
-                      </div>
-                    );
-                  })()
-                ) : (
-                  <Button
-                    onClick={() => inviteParticipantMutate(participant.id)}
-                    disabled={isInviteParticipantPending}
+                />
+                <div className="flex items-center justify-between">
+                  <div
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
+                      isComprador
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
+                        : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                    }`}
                   >
-                    Gerar link
-                  </Button>
+                    <TypeIcon className="w-4 h-4" />
+                    {isComprador ? 'Comprador' : 'Vendedor'}
+                  </div>
+                  <Badge variant="outline">
+                    {participant.person ? 'Vinculado' : 'Sem pessoa'}
+                  </Badge>
+                </div>
+                <Separator
+                  className={
+                    isComprador
+                      ? 'bg-blue-200/60 dark:bg-blue-800/40'
+                      : 'bg-emerald-200/60 dark:bg-emerald-800/40'
+                  }
+                />
+                {participant.company && participant.company.companyName ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <Info
+                      label="Nome da empresa"
+                      value={participant.company.companyName ?? '—'}
+                    />
+                    <Info
+                      label="Email"
+                      value={participant.company.email ?? '—'}
+                    />
+                    <Info
+                      label="Telefone"
+                      value={participant.company.phone ?? '—'}
+                    />
+                    <Info
+                      label="CNPJ"
+                      value={participant.company.cnpj ?? '—'}
+                    />
+                  </div>
+                ) : null}
+                {participant.person && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <Info label="Nome" value={participant.person.name ?? '—'} />
+                    <Info
+                      label="Email"
+                      value={participant.person.email ?? '—'}
+                    />
+                    <Info
+                      label="Telefone"
+                      value={participant.person.phone ?? '—'}
+                    />
+                    <Info label="CPF" value={participant.person.cpf ?? '—'} />
+                  </div>
                 )}
-              </div>
-
-              {participant.company && (
-                <div className="rounded-xl border border-border/60 bg-muted/40 p-4">
-                  <p className="text-sm font-medium text-foreground">
-                    Representantes vinculados
+                <div className="rounded-xl border border-border/60 bg-background/80 px-4 py-3 space-y-2">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Link para encaminhar dados do processo
                   </p>
 
-                  {participant.company.companyRepresentatives.length > 0 ? (
-                    <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
-                      {participant.company.companyRepresentatives.map(
-                        (representative) => (
-                          <li
-                            className="rounded-md border border-border/60 bg-background/80 px-3 py-2 space-y-1"
-                            key={representative.id}
+                  {participant.participantInvites.length ? (
+                    (() => {
+                      const latestInvite = getLatestParticipantInvite(
+                        participant.participantInvites
+                      );
+                      const token = latestInvite?.token;
+                      const inviteLink = token
+                        ? `https://lvh.me:5173/invite/${token}`
+                        : null;
+
+                      async function handleCopy() {
+                        if (!inviteLink) return;
+                        await navigator.clipboard.writeText(inviteLink);
+                        toast.success(
+                          'Link copiado para a área de transferência!'
+                        );
+                      }
+
+                      const expiresAt = latestInvite?.expiresAt;
+
+                      if (!expiresAt)
+                        return (
+                          <span className="text-sm text-muted-foreground">
+                            —
+                          </span>
+                        );
+
+                      const date = new Date(expiresAt);
+                      const expired = isPast(date);
+
+                      return (
+                        <div className="flex flex-wrap items-center gap-2">
+                          {!expired ? (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={handleCopy}
+                            >
+                              Copiar link
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() =>
+                                inviteParticipantMutate(participant.id)
+                              }
+                              disabled={isInviteParticipantPending}
+                            >
+                              Gerar link
+                            </Button>
+                          )}
+
+                          <span
+                            className={`text-sm ${
+                              expired
+                                ? 'text-red-500 font-medium'
+                                : 'text-muted-foreground'
+                            }`}
                           >
-                            <p className="font-medium text-foreground">
-                              {formatRepresentativeName(representative)}
-                            </p>
-                            {representative.person?.email && (
-                              <p>Email: {representative.person.email}</p>
-                            )}
-                            {representative.person?.phone && (
-                              <p>Telefone: {representative.person.phone}</p>
-                            )}
-                            {representative.person?.cpf && (
-                              <p>CPF: {representative.person.cpf}</p>
-                            )}
-                          </li>
-                        )
-                      )}
-                    </ul>
+                            {expired
+                              ? 'Expirado'
+                              : `Expira em ${formatDistanceToNow(date, {
+                                  addSuffix: false,
+                                  locale: ptBR,
+                                })}`}
+                          </span>
+                        </div>
+                      );
+                    })()
                   ) : (
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      Nenhum representante cadastrado para esta empresa.
-                    </p>
+                    <Button
+                      onClick={() => inviteParticipantMutate(participant.id)}
+                      disabled={isInviteParticipantPending}
+                    >
+                      Gerar link
+                    </Button>
                   )}
                 </div>
-              )}
-            </div>
+
+                {participant.company && (
+                  <div className="rounded-xl border border-border/60 bg-muted/40 p-4">
+                    <p className="text-sm font-medium text-foreground">
+                      Representantes vinculados
+                    </p>
+
+                    {participant.company.companyRepresentatives.length > 0 ? (
+                      <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                        {participant.company.companyRepresentatives.map(
+                          (representative) => (
+                            <li
+                              className="rounded-md border border-border/60 bg-background/80 px-3 py-2 space-y-1"
+                              key={representative.id}
+                            >
+                              <p className="font-medium text-foreground">
+                                {formatRepresentativeName(representative)}
+                              </p>
+                              {representative.person?.email && (
+                                <p>Email: {representative.person.email}</p>
+                              )}
+                              {representative.person?.phone && (
+                                <p>Telefone: {representative.person.phone}</p>
+                              )}
+                              {representative.person?.cpf && (
+                                <p>CPF: {representative.person.cpf}</p>
+                              )}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Nenhum representante cadastrado para esta empresa.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             );
           })}
         </CardContent>
