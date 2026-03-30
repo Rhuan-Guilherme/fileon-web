@@ -19,6 +19,7 @@ export interface ParticipantInvite {
   expiresAt: string;
   usedAt: string | null;
   createdAt: string;
+  password_token: string;
 }
 
 export interface Person {

@@ -49,9 +49,10 @@ export type FindInvitesResponse = {
   participant: InviteParticipant;
 };
 
-export async function findInvites(token: string) {
-  const response = await api.get<FindInvitesResponse>(
-    `/participants/invite/${token}`
+export async function findInvites(token: string, passwordToken: string) {
+  const response = await api.post<FindInvitesResponse>(
+    `/participants/invite/${token}`,
+    { passwordToken }
   );
 
   return response.data;

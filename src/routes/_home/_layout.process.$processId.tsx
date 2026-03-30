@@ -213,6 +213,7 @@ function RouteComponent() {
                       const inviteLink = token
                         ? `https://lvh.me:5173/invite/${token}`
                         : null;
+                      const password_token = latestInvite?.password_token;
 
                       async function handleCopy() {
                         if (!inviteLink) return;
@@ -235,40 +236,56 @@ function RouteComponent() {
                       const expired = isPast(date);
 
                       return (
-                        <div className="flex flex-wrap items-center gap-2">
-                          {!expired ? (
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={handleCopy}
-                            >
-                              Copiar link
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={() =>
-                                inviteParticipantMutate(participant.id)
-                              }
-                              disabled={isInviteParticipantPending}
-                            >
-                              Gerar link
-                            </Button>
-                          )}
+                        <div className="flex flex-wrap items-center justify-between gap-3 p-3 border rounded-xl bg-muted/30">
+                          {/* Ações */}
+                          <div className="flex items-center gap-2">
+                            {!expired ? (
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleCopy}
+                                className="shadow-sm"
+                              >
+                                📋 Copiar link
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() =>
+                                  inviteParticipantMutate(participant.id)
+                                }
+                                disabled={isInviteParticipantPending}
+                                size="sm"
+                                className="shadow-sm"
+                              >
+                                🔄 Gerar link
+                              </Button>
+                            )}
+                          </div>
 
-                          <span
-                            className={`text-sm ${
-                              expired
-                                ? 'text-red-500 font-medium'
-                                : 'text-muted-foreground'
-                            }`}
-                          >
-                            {expired
-                              ? 'Expirado'
-                              : `Expira em ${formatDistanceToNow(date, {
-                                  addSuffix: false,
-                                  locale: ptBR,
-                                })}`}
-                          </span>
+                          {/* Info */}
+                          <div className="flex flex-col text-sm justify-center items-center gap-2">
+                            <span className="font-medium">
+                              🔑 Senha:{' '}
+                              <span className="font-mono">
+                                {password_token}
+                              </span>
+                            </span>
+
+                            <span
+                              className={`text-xs ${
+                                expired
+                                  ? 'text-red-500 font-semibold'
+                                  : 'text-muted-foreground'
+                              }`}
+                            >
+                              {expired
+                                ? '⚠️ Link expirado'
+                                : `⏳ Expira em ${formatDistanceToNow(date, {
+                                    addSuffix: false,
+                                    locale: ptBR,
+                                  })}`}
+                            </span>
+                          </div>
                         </div>
                       );
                     })()

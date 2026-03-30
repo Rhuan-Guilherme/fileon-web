@@ -23,10 +23,11 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
+import { Lock } from 'lucide-react';
 
 export const Route = createFileRoute('/invite/$id')({
   component: RouteComponent,
@@ -86,8 +87,121 @@ function formatRepresentativeName(representative: {
   );
 }
 
+function PasswordGate({
+  onUnlock,
+  inviteId,
+}: {
+  onUnlock: (password: string) => void;
+  inviteId: string;
+}) {
+  const [digits, setDigits] = useState(['', '', '', '']);
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const [error, setError] = useState('');
+  const [saveSession, setSaveSession] = useState(false);
+
+  function handleChange(index: number, value: string) {
+    const digit = value.replace(/\D/g, '').slice(-1);
+    const next = [...digits];
+    next[index] = digit;
+    setDigits(next);
+    setError('');
+
+    if (digit && index < 3) {
+      inputsRef.current[index + 1]?.focus();
+    }
+  }
+
+  function handleKeyDown(index: number, e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Backspace' && !digits[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus();
+    }
+  }
+
+  function handlePaste(e: React.ClipboardEvent) {
+    e.preventDefault();
+    const pasted = e.clipboardData
+      .getData('text')
+      .replace(/\D/g, '')
+      .slice(0, 4);
+    if (!pasted) return;
+    const next = ['', '', '', ''];
+    for (let i = 0; i < pasted.length; i++) {
+      next[i] = pasted[i];
+    }
+    setDigits(next);
+    inputsRef.current[Math.min(pasted.length, 3)]?.focus();
+  }
+
+  function handleSubmit() {
+    const password = digits.join('');
+    if (password.length < 4) {
+      setError('Digite os 4 dígitos da senha');
+      return;
+    }
+    if (saveSession) {
+      localStorage.setItem(`invite_session_${inviteId}`, password);
+    }
+    onUnlock(password);
+  }
+
+  return (
+    <div className="min-h-dvh flex items-center justify-center p-6 bg-linear-to-br from-background via-background to-muted/40">
+      <Card className="w-full max-w-sm border-primary/20 shadow-xl">
+        <CardHeader className="items-center text-center gap-3">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+            <Lock className="h-7 w-7 text-primary" />
+          </div>
+          <div className="space-y-1.5">
+            <CardTitle className="text-xl">Senha de acesso</CardTitle>
+            <CardDescription>
+              Digite a senha de 4 dígitos para acessar os dados do convite.
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="flex justify-center gap-3" onPaste={handlePaste}>
+            {digits.map((digit, i) => (
+              <Input
+                key={i}
+                ref={(el) => {
+                  inputsRef.current[i] = el;
+                }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleChange(i, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(i, e)}
+                className="h-14 w-14 text-center text-2xl font-bold tracking-widest"
+              />
+            ))}
+          </div>
+          {error && <ErrorForm message={error} />}
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={saveSession}
+              onChange={(e) => setSaveSession(e.target.checked)}
+              className="h-4 w-4 rounded border-border accent-primary"
+            />
+            <span className="text-sm text-muted-foreground">
+              Manter sessão salva
+            </span>
+          </label>
+          <Button className="w-full" onClick={handleSubmit}>
+            Acessar
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 function RouteComponent() {
   const { id } = Route.useParams();
+  const [passwordToken, setPasswordToken] = useState<string | null>(() => {
+    return localStorage.getItem(`invite_session_${id}`);
+  });
 
   const {
     control,
@@ -109,8 +223,9 @@ function RouteComponent() {
   });
 
   const { data, isPending, isError } = useQuery({
-    queryKey: ['invite', id],
-    queryFn: () => findInvites(id),
+    queryKey: ['invite', id, passwordToken],
+    queryFn: () => findInvites(id, passwordToken!),
+    enabled: !!passwordToken,
   });
 
   useEffect(() => {
@@ -200,7 +315,6 @@ function RouteComponent() {
     }
 
     if (data.participant.companyId) {
-      console.log(formData);
       await updateCompanyMutate({
         companyId: data.participant.companyId!,
         data: {
@@ -228,6 +342,10 @@ function RouteComponent() {
   // eslint-disable-next-line react-hooks/incompatible-library
   const participantKind = watch('participantKind');
 
+  if (!passwordToken) {
+    return <PasswordGate inviteId={id} onUnlock={setPasswordToken} />;
+  }
+
   if (isPending) {
     return (
       <div className="min-h-dvh flex items-center justify-center p-6 bg-muted/30">
@@ -251,9 +369,20 @@ function RouteComponent() {
             <CardTitle>Convite inválido</CardTitle>
             <CardDescription>
               Não foi possível carregar os dados do convite. Verifique o link e
-              tente novamente.
+              tente novamente. A senha pode estar incorreta.
             </CardDescription>
           </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              onClick={() => {
+                localStorage.removeItem(`invite_session_${id}`);
+                setPasswordToken(null);
+              }}
+            >
+              Tentar novamente
+            </Button>
+          </CardContent>
         </Card>
       </div>
     );
